@@ -26,7 +26,7 @@ $('resetProg').addEventListener('click',e=>{
   if(!resetArmed){ resetArmed=setTimeout(()=>{resetArmed=0;b.classList.remove('armed');b.textContent='Reset progress'},3000);
     b.classList.add('armed'); b.textContent='Tap again to erase all progress'; return; }
   clearTimeout(resetArmed); resetArmed=0; b.classList.remove('armed'); b.textContent='Reset progress';
-  prog={stars:[],best:[],trained:false,seen:[]}; ensureEco(); saveProg(); curLevel=0; training=false; enterMode();
+  b.blur(); setDev(false); prog={stars:[],best:[],trained:false,seen:[]}; ensureEco(); saveProg(); curLevel=0; training=false; enterMode();
 });
 $('howOpen').addEventListener('click',()=>showHow('view'));
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ if(!$('howOv').hidden) drawHow() });
@@ -144,6 +144,12 @@ function zoneMarker(g,x,top,bot,s,side){
   const mid=(top+bot)/2, tx=side==='right'?x-14*s:x+14*s, al=side==='right'?'right':'left';
   g.font=`${Math.round(16*s)}px "Lilita One", system-ui, sans-serif`; g.textAlign=al; g.lineWidth=4*s; g.strokeStyle='rgba(19,34,56,.85)'; g.fillStyle='#fff';
   for(const [t,dy] of [['RADAR',-3*s],['ZONE',15*s]]){ g.strokeText(t,tx,mid+dy); g.fillText(t,tx,mid+dy); }
+  // danger triangle, centred above the label
+  const ix=side==='right'?tx-24*s:tx+24*s, iy=mid-30*s;
+  g.beginPath(); g.moveTo(ix,iy-10*s); g.lineTo(ix+11*s,iy+9*s); g.lineTo(ix-11*s,iy+9*s); g.closePath();
+  g.fillStyle='#ffd23f'; g.fill(); g.strokeStyle='#132238'; g.lineWidth=2.5*s; g.stroke();
+  g.beginPath(); g.moveTo(ix,iy-3.5*s); g.lineTo(ix,iy+2*s); g.lineWidth=2.6*s; g.stroke();
+  g.beginPath(); g.arc(ix,iy+5.8*s,1.5*s,0,Math.PI*2); g.fillStyle='#132238'; g.fill();
   g.restore();
 }
 function drawRadarCard(g,Wc,Hc){
@@ -157,25 +163,26 @@ function drawRadarCard(g,Wc,Hc){
   g.strokeStyle='#eafff4'; g.lineWidth=2; g.strokeRect(1,bandTop+1,Wc-2,bandH-2);
   g.fillStyle='#6fae4f'; g.fillRect(0,groundY,Wc,Hc-groundY); g.fillStyle='#5a9440'; g.fillRect(0,groundY,Wc,4);
   // title
-  cardText(g,Wc/2,34,'Radar ahead!',26,'#ffffff','center');
+  cardText(g,Wc/2,34,'Skip radar zone',26,'#ffffff','center');
   drawPlane(262,60,0.75);   // the plane flies above the radar
   const SUIT='#ff5a36', mk=(state,chuteT=1)=>({i:0,suit:SUIT,state,chuteT,heavy:false,dummy:false});
-  // LEFT: opened inside the radar -> caught
-  const A={x:86,y:178};
+  // MIDDLE: opened inside the radar -> caught
+  const A={x:150,y:178};
   const post=cardPost(g,34,groundY,1);
   g.fillStyle='rgba(255,240,150,.55)'; g.beginPath(); g.moveTo(post.x,post.y); g.lineTo(A.x-24,A.y-60); g.lineTo(A.x+26,A.y-44); g.closePath(); g.fill();
   drawDiver(mk('chute'),A.x,A.y,1.3,0);
   cardHand(g,A.x+32,A.y+6);
   g.fillStyle='#ff3b3b'; g.beginPath(); g.arc(A.x+22,A.y-72,11,0,Math.PI*2); g.fill();
   g.fillStyle='#fff'; g.font='bold 15px "Lilita One", system-ui, sans-serif'; g.textAlign='center'; g.fillText('!',A.x+22,A.y-67);
-  cardText(g,A.x-6,A.y+40,'✕ Caught!',19,'#ff8a7a','center');
-  // RIGHT: fall through closed, open below the radar -> safe
+  cardText(g,A.x-54,A.y+40,'✕ Caught!',19,'#ff8a7a','center');
+  // LEFT to RIGHT: fall through closed, open below the radar -> safe
   cardPost(g,292,groundY,1);
-  const B1={x:222,y:124}, B2={x:222,y:bandTop+bandH-2};
+  const B1={x:48,y:124}, B2={x:222,y:bandTop+bandH-2};   // reads top-left to bottom-right, like the how-to card
   drawDiver(mk('fall'),B1.x,B1.y,1.25,0);
+  const tip={x:B2.x-6,y:B2.y-58}, a=Math.atan2(tip.y-B1.y,tip.x-B1.x), ca=Math.cos(a), sa=Math.sin(a);
   g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2;
-  g.beginPath(); g.moveTo(B1.x,B1.y+8); g.lineTo(B1.x,B2.y-66); g.stroke(); g.setLineDash([]);
-  g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(B1.x,B2.y-58); g.lineTo(B1.x-6,B2.y-68); g.lineTo(B1.x+6,B2.y-68); g.fill();
+  g.beginPath(); g.moveTo(B1.x+ca*14,B1.y+sa*14); g.lineTo(tip.x-ca*10,tip.y-sa*10); g.stroke(); g.setLineDash([]);
+  g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(tip.x,tip.y); g.lineTo(tip.x-ca*10-sa*6,tip.y-sa*10+ca*6); g.lineTo(tip.x-ca*10+sa*6,tip.y-sa*10-ca*6); g.fill();
   drawDiver(mk('chute'),B2.x,B2.y,1.25,0);
   cardHand(g,B2.x-30,B2.y-4);
   cardText(g,B2.x+44,bandTop-48,'✓ Safe',19,'#9ff2c4','center');
@@ -221,11 +228,14 @@ function drawHow(){
   // hands sit in their own column at the left, level with each diver: they say WHEN to tap, not WHERE (tap anywhere)
   hand(36,d1.y-14); hand(36,bandTop+bandH/2+14); hand(36,groundY-10);
   // marks
-  brokenHeart(d1.x+26,d1.y-66,26,0.55);   // too early costs a heart (same broken heart as in the game)
-  const star=(cx,cy,r)=>{g.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*0.45:r;g.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}g.closePath();g.fillStyle='#ffe066';g.fill();g.strokeStyle='#132238';g.lineWidth=1.5;g.stroke()};
-  star(d2.x-30,bandTop+bandH/2,10);
-  const wx=d3.x-30;
-  brokenHeart(wx-6,groundY-26,24,0.55);   // too late costs a heart too (kept well below the band so it reads as step 3)
+  const stroke2=(col,draw)=>{ g.lineCap='round'; g.lineJoin='round'; g.beginPath(); draw();   // dark outline, then the colour
+    g.strokeStyle='#132238'; g.lineWidth=8; g.stroke(); g.strokeStyle=col; g.lineWidth=4.5; g.stroke(); };
+  const cross=(cx,cy,r)=>stroke2('#ff4d4d',()=>{g.moveTo(cx-r,cy-r);g.lineTo(cx+r,cy+r);g.moveTo(cx+r,cy-r);g.lineTo(cx-r,cy+r)});
+  const tick=(cx,cy,r)=>stroke2('#3be07a',()=>{g.moveTo(cx-r,cy);g.lineTo(cx-r*0.25,cy+r*0.75);g.lineTo(cx+r,cy-r*0.75)});
+  // each mark sits just left of its diver, level with the body
+  cross(d1.x-30,d1.y-16,8);   // too early
+  tick(d2.x-30,d2.y-16,10);   // perfect
+  cross(d3.x-30,d3.y-16,8);   // too late
   g.strokeStyle='rgba(90,70,50,.7)'; g.lineWidth=2; for(const a of [-0.9,-0.5,0.5,0.9]){g.beginPath();g.moveTo(d3.x+Math.sin(a)*10,groundY+2);g.lineTo(d3.x+Math.sin(a)*22,groundY-6);g.stroke()}
   // labels (numbered top to bottom)
   const label=(x,y,num,t1,t2,col)=>{
@@ -330,4 +340,14 @@ function showGrad(perf,hs,gift){
   else { const pr=document.createElement('button'); pr.className='btn'; pr.textContent='Practice again';
     pr.onclick=()=>{ $('gradOv').hidden=true; startTraining('grad'); };
     startB.className='btn ghost'; acts.appendChild(pr); acts.appendChild(startB); SFX.rate('good',0); }
+}
+
+// ---------- fit cards to short screens (the store and result screens scroll instead) ----------
+const fitList=[...document.querySelectorAll('.ov .card:not(.shopcard)')];
+function fitCards(){
+  for(const c of fitList){
+    const h=c.offsetHeight; if(!h) continue;   // hidden
+    const s=Math.min(1,(c.parentElement.clientHeight-32)/h);   // 32 = the overlay's padding
+    c.style.transform=s<1?`scale(${s})`:'';
+  }
 }

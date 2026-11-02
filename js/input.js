@@ -52,8 +52,9 @@ addEventListener('keydown',e=>{
     if(!$('startOv').hidden){e.preventDefault();start()}
     else if(!$('levelsOv').hidden){e.preventDefault();const n=LEVELS.findIndex((_,i)=>unlocked(i)&&!(prog.stars[i]>0));curLevel=n<0?0:n; training=false; start()}
     else if(!$('howOv').hidden){e.preventDefault();$('howBtn').click()}
+    else if(!$('wPop').hidden){e.preventDefault();$('wPop').hidden=true}
     else if(!$('endOv').hidden&&performance.now()-endShownAt>500){e.preventDefault();
-      if(settings.mode==='levels'&&(!$('nextBtn').hidden||nextPending)&&unlocked(curLevel+1)){curLevel++;} start()}
+      if(settings.mode==='levels'&&!$('nextBtn').hidden) $('nextBtn').click(); else start()}
   }
 });
 

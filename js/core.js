@@ -10,3 +10,4 @@ const settings=Object.assign({},DEF);
 try{const s=JSON.parse(store.get('chuteRhythm.v3.settings')||'{}');for(const k in DEF) if(k in s) settings[k]=s[k]}catch(e){}
 const VKEYS=['platforms','faulty','heavy','dive','vents','clouds'];
 let S=null, running=false, lastTS=0;
+const AD_ICO='<i class="ico i-ad" role="img" aria-label="Watch ad"></i>';   // every rewarded-ad button starts with this

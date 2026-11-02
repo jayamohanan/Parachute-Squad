@@ -231,20 +231,16 @@ function draw(){
 
   // HUD
   if(S){
-    ctx.textAlign='left';ctx.font=`${Math.round(22*k)}px "Lilita One", system-ui, sans-serif`;
-    ctx.lineWidth=4;ctx.strokeStyle='rgba(19,34,56,.6)';
-    const hud=`★ ${S.perf}/${S.humansN}`;ctx.strokeText(hud,14,30*k);ctx.fillStyle='#fff';ctx.fillText(hud,14,30*k);
-    ctx.font=`${Math.round(13*k)}px "Nunito", system-ui, sans-serif`;ctx.fillStyle='rgba(255,255,255,.92)';
-    const dropped=S.divers.filter(d=>d.state!=='wait');
-    const lastD=dropped[dropped.length-1];
-    const lvl=S.training?'Training · ':S.level!=null?`Level ${levelLabel(S.level)} · `:'';
-    const info=lvl+(!lastD?'Get ready':lastD.dummy?`Count-in · dummy ${lastD.i+1}/${S.ci}`:`Diver ${lastD.i-S.ci+1}/${S.humansN}`);
-    ctx.fillText(info,14,50*k);
-    if(S.streak>1){ctx.fillStyle='#2fd88a';ctx.fillText(`Perfect streak ×${S.streak}`,14,68*k)}
+    if(S.level!=null){
+      ctx.textAlign='center';ctx.font=`${Math.round(22*k)}px "Lilita One", system-ui, sans-serif`;
+      ctx.lineWidth=4;ctx.strokeStyle='rgba(19,34,56,.6)';
+      const lvl=`Level ${levelLabel(S.level)}`;ctx.strokeText(lvl,W/2,28*k);ctx.fillStyle='#fff';ctx.fillText(lvl,W/2,28*k);
+      ctx.textAlign='left';
+    }
     if(S.heartsMax){
       const sz=26*k, gap=8*k, x0=W/2-(S.heartsMax*sz+(S.heartsMax-1)*gap)/2+sz/2;
       for(let i=0;i<S.heartsMax;i++){
-        const x=x0+i*(sz+gap), y=12*k, full=i<S.hearts;
+        const x=x0+i*(sz+gap), y=36*k, full=i<S.hearts;
         const lostNow=(i===S.hearts||(S.col&&i>=S.hearts))&&S.t-S.heartLostT<0.45, sc=lostNow?1+0.6*Math.sin((S.t-S.heartLostT)/0.45*Math.PI):1;
         ctx.save();ctx.translate(x,y+sz/2);ctx.scale(sc,sc);ctx.translate(0,-sz/2);
         heartPath(0,0,sz);

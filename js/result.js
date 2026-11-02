@@ -6,7 +6,7 @@ let resultSeq=0;   // bumps every time a result is shown or left, so delayed eff
 // opens or a button is pressed — never at the end of an animation — so skipping can't lose anything.
 let resultTimers=[];
 function rt(fn,ms){ const id=setTimeout(()=>{ resultTimers=resultTimers.filter(x=>x!==id); fn(); },ms); resultTimers.push(id); return id; }
-function leaveResult(){ resultSeq++; for(const id of resultTimers) clearTimeout(id); resultTimers=[]; SFX.cutAll(); }
+function leaveResult(){ resultSeq++; for(const id of resultTimers) clearTimeout(id); resultTimers=[]; SFX.cutAll(); $('wPop').hidden=true; }
 function showEnd(){
   resultSeq++; $('strip').className='strip'; $('strip').style.minHeight='';
   if(S.training){   // training never fails. First time (and "Practice again" from the card): graduation card. From "?": back to the levels.
@@ -42,7 +42,7 @@ function showEnd(){
     close>=4?'Living dangerously':
     splats===0?'Everyone walked away':'Mostly in one piece';
   $('rBadge').hidden=!(isBest&&prev>=0); $('rBadge').textContent='NEW BEST!';
-  $('againBtn').className='btn'; $('spaceHint').textContent='or press Space';
+  $('againBtn').className='btn';
   $('rPB').textContent=prev<0?'First jump with this setup.':isBest?`Up from ${prev}/12 on this setup.`:`Best on this setup: ${prev}/12`;
   $('stats').innerHTML=[['p',perf,'Perfect'],['c',close,'Misses'],['x',splats,'Splats'],['',S.best,'Best streak']]
     .map(([cl,v,l])=>`<div class="stat ${cl}"><strong>${v}</strong>${l}</div>`).join('');
@@ -57,9 +57,8 @@ function showEnd(){
 
 // v6.7: one icon per meaning. Perfect = small open chute; any landing that cost a life = 💔;
 // after the last life is gone nothing counts any more (grey dot), so a fail always shows exactly the lives that were lost.
-const CHUTE_ICON='<svg class="tchute" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-10.5,-2 A10.5,8.5 0 0 1 10.5,-2 Z" fill="#fff" stroke="#0d4a2c" stroke-width="1.6" stroke-linejoin="round"/><path d="M-3.5,-2 A3.5,8.5 0 0 1 3.5,-2" fill="none" stroke="#0d4a2c" stroke-width="1.2"/><path d="M-10,-2 L0,8 M10,-2 L0,8" stroke="#0d4a2c" stroke-width="1.2" fill="none"/><circle cx="0" cy="9" r="2.4" fill="#0d4a2c"/></svg>';
-const TILE_ICON={perfect:CHUTE_ICON,miss:'💔',none:'·'};
-let nextPending=false;   // a next world is being unlocked on this result screen (button appears when the animation ends)
+const TICK_ICON='<svg class="ttick" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-8,0.5 L-2.5,6 L8,-6" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TILE_ICON={perfect:TICK_ICON,miss:'💔',none:'·'};
 function showLevelEnd(){
   const n=S.level, L=LEVELS[n], N=S.humansN, humans=S.divers.filter(d=>!d.dummy);
   const cls=d=>d.rating==='perfect'?'perfect':d.lost?'miss':'none';
@@ -75,7 +74,7 @@ function showLevelEnd(){
   saveProg();   // everything (stars, coins, wins, a world opened by these stars) is saved now; animations only show it
   const opensNow=worldEnd&&passed&&!wasOpen&&worldOpen(nw);
   renderCoinRow(earned); if(passed) renderTrack(); else $('rTrack').hidden=true;
-  $('rMode').textContent=`World ${worldOf(n)+1} · Level ${n%PER_WORLD+1}`;
+  $('rMode').textContent=`Level ${levelLabel(n)}`;
   $('endOv').querySelector('.result').classList.toggle('lost',!passed);
   $('rFail').hidden=passed;
   let doneAt=600;   // when the result animations are over (ms)
@@ -116,46 +115,46 @@ function showLevelEnd(){
     doneAt=Math.max(doneAt,t0+t1+1600);
   }
   // buttons; the last level of a world always shows the way to the next world
-  nextPending=false;
-  const hasNext=passed&&n<LEVELS.length-1&&unlocked(n+1)&&!opensNow;
-  $('nextBtn').hidden=!hasNext; $('nextBtn').classList.remove('popbtn');
-  $('nextBtn').textContent=worldEnd?`World ${nw+1} ▶`:'Next level';
+  const toWorld=worldEnd&&passed, hasNext=toWorld||(passed&&n<LEVELS.length-1&&unlocked(n+1));
+  const nb=$('nextBtn'); nb.hidden=!hasNext; nb.classList.remove('popbtn'); nb.classList.toggle('wend',toWorld);
+  nb.innerHTML='<i class="ico lg i-next" role="img" aria-label="Next level"></i>';
   $('againBtn').className=hasNext?'btn ghost':'btn';
-  $('spaceHint').textContent=hasNext||opensNow?'or press Space for next':'or press Space to retry';
-  $('rWorld').hidden=true;
-  if(worldEnd&&passed){
-    // before the unlock animation the row shows the stars from BEFORE this run (and no ad: the stars already did it)
-    renderWorldRow(nw,wasOpen?'open':'locked',opensNow?worldStars(nw-1)-Math.max(0,st-prevSt):null);
-    if(opensNow){ nextPending=true; const seq=resultSeq; rt(()=>{ if(seq===resultSeq) playWorldUnlock(nw); },reduceMotion?300:doneAt); }
+  if(toWorld){
+    // before the unlock animation the button shows the stars from BEFORE this run
+    renderWorldBtn(nw,wasOpen,opensNow?totalStars()-Math.max(0,st-prevSt):null);
+    if(opensNow){ const seq=resultSeq; rt(()=>{ if(seq===resultSeq) playWorldUnlock(nw); },reduceMotion?300:doneAt); }
   }
   $('endOv').hidden=false;$('endOv').scrollTop=0;endShownAt=performance.now();
 }
-// the next-world row on the result screen of a world's last level
-function renderWorldRow(nw,mode,before){
-  const el=$('rWorld'), ts=before!=null?before:worldStars(nw-1), need=Math.max(0,W_NEED-ts), canGate=mode==='locked'&&before==null&&ts>=GATE_MIN;
-  el.hidden=false; el.className='w2 wend'+(mode==='open'?' open':'');
-  el.innerHTML=`<span class="lock">${mode==='open'?'🔓':'🔒'}</span><div style="flex:1;min-width:0"><b>World ${nw+1} · ${WORLDS[nw].name}</b>
-    <span>${mode==='open'?'Unlocked!':`${need} more ★ to unlock · ${ts}/${W_NEED}★`}</span></div>`+
-    (canGate?`<button class="gatebtn" id="rGate">▶ Unlock now</button>`
-      :mode==='open'?'':`<div class="bar2"><i style="width:${Math.min(100,ts/W_NEED*100).toFixed(0)}%"></i></div>`);
-  if(canGate) $('rGate').onclick=()=>watchAd(()=>{ prog.gate[nw]=1; saveProg(); nextPending=true; playWorldUnlock(nw); });
+// the next-world button on the result screen of a world's last level; locked, it shows the stars and opens the popup
+function renderWorldBtn(nw,open,before){
+  const ts=before!=null?before:totalStars();
+  $('nextBtn').innerHTML=open?`World ${nw+1} ▶`:`<span class="lock">🔒</span> World ${nw+1}<small>${ts}/${worldNeed(nw)}★</small>`;
 }
-function playWorldUnlock(nw){   // lock shakes, opens, UNLOCKED! stamp + confetti, then the next-world button pops in
-  const el=$('rWorld'), seq=resultSeq, lock=el.querySelector('.lock'); if(lock) lock.classList.add('shake');
+function showWorldPop(nw){
+  const ts=totalStars(), need=worldNeed(nw), gate=$('rGate');
+  $('wpTitle').textContent=`🔒 World ${nw+1}`;
+  $('wpNeed').textContent=`${need}★ needed · you have ${ts}★`;
+  gate.hidden=ts<need-GATE_NEAR;
+  gate.onclick=()=>watchAd(()=>{ prog.gate[nw]=1; saveProg(); $('wPop').hidden=true; playWorldUnlock(nw); });
+  $('wPop').hidden=false;
+}
+$('wpClose').addEventListener('click',()=>{ $('wPop').hidden=true; });
+$('wpLevels').addEventListener('click',()=>{ $('wPop').hidden=true; viewWorld=worldOf(curLevel); showLevels(true); });
+function playWorldUnlock(nw){   // lock shakes, opens, UNLOCKED! stamp + confetti on the next-world button
+  const b=$('nextBtn'), seq=resultSeq, lock=b.querySelector('.lock'); if(lock) lock.classList.add('shake');
   rt(()=>{ if(seq!==resultSeq) return;
-    renderWorldRow(nw,'open'); el.classList.add('justopen');
+    renderWorldBtn(nw,true); b.classList.add('popbtn');
     const cols=['#ff5a36','#ffd23f','#2fd88a','#4dabf7','#e8417a','#ffffff'];
-    el.insertAdjacentHTML('beforeend','<div class="stamp">UNLOCKED!</div>'+(reduceMotion?'':Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*240-40).toFixed(0)}px;--y:${(-Math.random()*80-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('')));
+    b.insertAdjacentHTML('beforeend','<div class="stamp">UNLOCKED!</div>'+(reduceMotion?'':Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*240-40).toFixed(0)}px;--y:${(-Math.random()*80-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('')));
     SFX.worldOpen();
-    const b=$('nextBtn'); b.textContent=`World ${nw+1} ▶`; b.hidden=false; b.classList.add('popbtn');
-    $('againBtn').className='btn ghost'; nextPending=false;
   },reduceMotion?0:550);
 }
 
 // ---------- result screen: coins + reward track ----------
 function renderCoinRow(earned){
   const el=$('rCoins'); if(!earned){ el.innerHTML=''; return; }
-  el.innerHTML=`<i class="coin"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">▶ ×2</button>`;
+  el.innerHTML=`<i class="coin"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">${AD_ICO} ×2</button>`;
   $('dblBtn').onclick=()=>watchAd(()=>{ prog.coins+=earned; saveProg(); $('rCoinN').textContent=earned*2; const b=$('dblBtn'); b.disabled=true; b.textContent='Doubled!'; });
 }
 function drawSilhouette(cv,kind,id,frac){
@@ -164,17 +163,19 @@ function drawSilhouette(cv,kind,id,frac){
   g.drawImage(off,0,0); g.globalCompositeOperation='source-in'; g.fillStyle='#0b1526'; g.fillRect(0,0,cv.width,cv.height); g.globalCompositeOperation='source-over';
   if(frac>0){ const h=cv.height*Math.min(1,frac); g.save(); g.beginPath(); g.rect(0,cv.height-h,cv.width,h); g.clip(); g.drawImage(off,0,0); g.restore(); }
 }
-function celebrateClaim(el,kind,id,obj){   // item pops out, rays, UNLOCKED! stamp, confetti, Equipped; then the next reward
+function celebrateClaim(el,kind,id,obj,old){   // item pops out, rays, UNLOCKED! stamp, confetti, Equipped + Keep old; then the next reward
   const seq=resultSeq, cols=['#ff5a36','#ffd23f','#2fd88a','#4dabf7','#e8417a','#ffffff'];
   el.className='track reveal';
   el.innerHTML=`<div class="tcan"><div class="rays"></div><canvas width="136" height="136"></canvas></div>
-    <div style="flex:1;min-width:0"><div class="tt">${obj.name}</div><span class="eq">✓ Equipped</span></div>
+    <div style="flex:1;min-width:0"><div class="tt">${obj.name}</div><span class="eq">✓ Equipped</span><button class="keepold">Keep old</button></div>
     <div class="stamp">UNLOCKED!</div>`+
     Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*220-60).toFixed(0)}px;--y:${(-Math.random()*90-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('');
   itemThumb(el.querySelector('canvas'),kind,id);
+  const keep=el.querySelector('.keepold');
+  keep.onclick=()=>{ prog.sel[kind]=old; saveProg(); keep.remove(); el.querySelector('.eq').textContent='✓ In your Store'; };
   SFX.end(true); rt(()=>SFX.star(2),180);
   rt(()=>{ if(seq!==resultSeq) return; el.classList.add('fadeout');
-    rt(()=>{ if(seq!==resultSeq) return; renderTrack(); },300); },1900);
+    rt(()=>{ if(seq!==resultSeq) return; renderTrack(); },300); },4000);
 }
 function renderTrack(){
   const el=$('rTrack'), it=trackItem(); if(!it||prog.rlv>=REWARD_LV.length){ el.hidden=true; return; }
@@ -190,8 +191,8 @@ function renderTrack(){
   if(!due){ requestAnimationFrame(()=>requestAnimationFrame(()=>{ const i=el.querySelector('.tbar i'); if(i) i.style.width=(got/span*100)+'%'; })); return; }
   const used=()=>{ prog.trackDone++; prog.rlv++; saveProg(); };
   const acts=el.querySelector('.tacts');
-  const claim=document.createElement('button'); claim.className='btn'; claim.textContent=free?'Claim':'▶ Claim';
-  claim.onclick=()=>{ const go=()=>{ grant(kind,id,true); used(); celebrateClaim(el,kind,id,obj); }; free?go():watchAd(go); };
+  const claim=document.createElement('button'); claim.className='btn'; claim.innerHTML=free?'Claim':`${AD_ICO} Claim`;
+  claim.onclick=()=>{ const go=()=>{ const old=prog.sel[kind]; grant(kind,id,true); used(); celebrateClaim(el,kind,id,obj,old); }; free?go():watchAd(go); };
   acts.appendChild(claim);
   if(!free){ const no=document.createElement('button'); no.className='btn ghost'; no.textContent='No thanks';
     no.onclick=()=>{ used(); renderTrack(); }; acts.appendChild(no); }

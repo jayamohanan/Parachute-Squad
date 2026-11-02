@@ -42,7 +42,7 @@ function renderShop(){
         prog.coins-=price; grant(kind,it.id,true); SFX.end(true); renderShop(); };
       acts.appendChild(b);
       if(need){
-        const a=document.createElement('button'); a.className='ibtn ad'; a.textContent=`▶ ${have}/${need}`;
+        const a=document.createElement('button'); a.className='ibtn ad'; a.innerHTML=`${AD_ICO} ${have}/${need}`;
         a.onclick=()=>watchAd(()=>{ prog.adp[key]=(prog.adp[key]||0)+1; if(prog.adp[key]>=need) grant(kind,it.id,true); saveProg(); renderShop(); });
         acts.appendChild(a);
       }
@@ -54,7 +54,7 @@ function renderShop(){
 function updateAdCoinsBtn(){
   const left=Math.max(0,(prog.adCoinsT||0)+AD_COINS_CD-Date.now()), ab=$('adCoins');
   ab.disabled=left>0; ab.style.opacity=left>0?.5:1;
-  ab.innerHTML=left>0?`▶ +${AD_COINS} in ${Math.ceil(left/1000)}s`:`▶ +${AD_COINS} <i class="coin sm"></i>`;
+  ab.innerHTML=left>0?`${AD_ICO} +${AD_COINS} in ${Math.ceil(left/1000)}s`:`${AD_ICO} +${AD_COINS} <i class="coin sm"></i>`;
 }
 setInterval(()=>{ if(!$('shopOv').hidden) updateAdCoinsBtn(); },1000);
 document.querySelectorAll('.tab').forEach(t=>t.addEventListener('click',()=>{ shopTab=t.dataset.tab; renderShop(); }));
@@ -62,4 +62,4 @@ $('shopOpen').addEventListener('click',()=>{ $('levelsOv').hidden=true; $('shopO
 $('shopBack').addEventListener('click',()=>{ $('shopOv').hidden=true; showLevels(true); });
 $('adCoins').addEventListener('click',()=>{ if($('adCoins').disabled) return;
   watchAd(()=>{ prog.coins+=AD_COINS; prog.adCoinsT=Date.now(); saveProg(); renderShop(); }); });
-$('addCoins').addEventListener('click',()=>{ prog.coins+=1000; saveProg(); refreshCoins(); });
+$('addCoins').addEventListener('click',e=>{ prog.coins+=1000; saveProg(); refreshCoins(); e.currentTarget.blur(); });

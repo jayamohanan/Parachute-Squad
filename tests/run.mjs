@@ -87,7 +87,7 @@ console.log('Result screen and rules:');
   ok(p.stars[0] === 2, '1 miss → 2 stars saved', 'stars ' + p.stars[0]);
   ok(count(t, 'miss') === 1 && count(t, 'perfect') === t.length - 1, 'strip: one 💔, rest perfect chutes', t.join(','));
   ok(!(await vis(page, 'rFail')), 'no fail title on a pass');
-  ok((await page.evaluate(() => document.getElementById('rTrack').textContent)).includes('Unlocks at Level 1-5'), 'reward track says "Unlocks at Level 1-5"');
+  ok((await page.evaluate(() => document.getElementById('rTrack').textContent)).includes('Unlocks at Level 5'), 'reward track says "Unlocks at Level 5"');
   ok(await vis(page, 'nextBtn'), 'Next level button shown');
   ok(errors.length === 0, 'no page errors', errors.join(' | '));
   await page.close();
@@ -119,7 +119,7 @@ console.log('Result screen and rules:');
   const { page, errors } = await open({ stars: [3, 3, 3, 3, 3, 3, 3, 1, 0, 0] });
   await playUntilEnd(page, 9); await page.clock.runFor(600);
   ok((await progOf(page)).stars[9] === 3, 'stars saved before the animation');
-  ok(await vis(page, 'rWorld') && !(await vis(page, 'nextBtn')), 'world row shown locked first, button not yet');
+  ok(await vis(page, 'nextBtn') && (await text(page, 'nextBtn')).includes('🔒'), 'World 2 button shown locked first');
   await page.keyboard.press('Space').catch(() => {});
   await page.clock.runFor(100);
   ok(await page.evaluate(() => __chute.state() && __chute.state().level === 10), 'Space during the unlock animation starts World 2');
@@ -130,14 +130,15 @@ console.log('Result screen and rules:');
   const { page } = await open({ stars: [3, 3, 3, 3, 3, 3, 3, 1, 0, 0] });
   await playUntilEnd(page, 9); await page.clock.runFor(5000);
   ok(await vis(page, 'nextBtn') && (await text(page, 'nextBtn')).includes('World 2'), '"World 2 ▶" appears after the animation');
-  ok((await page.evaluate(() => document.getElementById('rWorld').textContent)).includes('Unlocked'), 'world row shows Unlocked!');
+  ok((await text(page, 'nextBtn')).includes('UNLOCKED!'), 'World 2 button shows UNLOCKED!');
   await page.close();
 }
 // ---------- 6. world end at 20-24★: gate ad opens World 2 ----------
 {
   const { page, errors } = await open({ stars: [3, 3, 3, 3, 3, 2, 1, 1, 1, 0] });
   await playUntilEnd(page, 9); await page.clock.runFor(2500);
-  ok(await vis(page, 'rGate'), '"▶ Unlock now" offered at 23★');
+  await page.click('#nextBtn');
+  ok(await vis(page, 'rGate'), '"Unlock now" offered in the popup at 23★');
   await page.click('#rGate'); await page.clock.runFor(3200);
   ok((await progOf(page)).gate[1] === 1, 'gate ad unlock saved');
   ok(await vis(page, 'nextBtn'), '"World 2 ▶" shown after the ad');
@@ -148,7 +149,24 @@ console.log('Result screen and rules:');
 {
   const { page } = await open({ stars: [3, 3, 3, 2, 1, 1, 1, 1, 1, 0] });
   await playUntilEnd(page, 9); await page.clock.runFor(2500);
-  ok(await vis(page, 'rWorld') && !(await vis(page, 'rGate')) && !(await vis(page, 'nextBtn')), 'locked row, no ad, no next button at 19★');
+  ok(await vis(page, 'nextBtn') && (await text(page, 'nextBtn')).includes('19/25'), 'World 2 button shows the stars at 19★');
+  await page.click('#nextBtn');
+  ok(await vis(page, 'wPop') && (await text(page, 'wpNeed')).includes('25★') && !(await vis(page, 'rGate')), 'locked: popup says 25★ needed, no ad at 19★');
+  await page.click('#wpClose');
+  ok(!(await vis(page, 'wPop')) && await vis(page, 'endOv'), 'Close returns to the result screen');
+  await page.click('#nextBtn'); await page.click('#wpLevels');
+  ok(await vis(page, 'levelsOv') && !(await vis(page, 'wPop')) && (await text(page, 'wName')).includes('World 1'), 'popup Levels goes to the levels of this world');
+  await page.close();
+}
+// ---------- 7b. worlds open on the running star total ----------
+{
+  const { page } = await open({ stars: [3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 3, 1] });
+  ok(await page.evaluate(() => worldOpen(2)), 'running total: 28★ + 22★ opens World 3');
+  await page.close();
+}
+{
+  const { page } = await open({ stars: [3, 3, 3, 3, 3, 3, 3, 3, 3, 1, 3, 3, 3, 3, 3, 3, 2, 1] });
+  ok(await page.evaluate(() => worldOpen(1) && !worldOpen(2)), 'running total: 49★ keeps World 3 locked');
   await page.close();
 }
 // ---------- 8. caught by radar ----------
@@ -160,11 +178,11 @@ console.log('Result screen and rules:');
   ok(errors.length === 0, 'no page errors', errors.join(' | '));
   await page.close();
 }
-// ---------- 9. level grid: earned stars only ----------
+// ---------- 9. level grid: three stars, unearned ones dim ----------
 {
   const { page } = await open({ stars: [3, 1, 2] });
-  const smalls = await page.evaluate(() => [...document.querySelectorAll('.lv small')].slice(0, 4).map(s => s.textContent));
-  ok(smalls[0] === '★★★' && smalls[1] === '★' && smalls[2] === '★★' && smalls[3] === '', 'grid shows earned stars only', JSON.stringify(smalls));
+  const smalls = await page.evaluate(() => [...document.querySelectorAll('.lv small')].slice(0, 4).map(s => s.querySelectorAll('span').length + ':' + s.querySelectorAll('span:not(.dim)').length));
+  ok(smalls[0] === '3:3' && smalls[1] === '3:1' && smalls[2] === '3:2' && smalls[3] === '3:0', 'grid shows three stars, unearned ones dim', JSON.stringify(smalls));
   await page.close();
 }
 
@@ -209,6 +227,32 @@ console.log('Result screen and rules:');
   ok(!(await page.evaluate(() => document.getElementById('strip').textContent.includes('undefined'))), 'sandbox: tiles have icons');
   ok(errors.length === 0, 'no page errors', errors.join(' | '));
   await page.close();
+}
+
+// ---------- 12. cards fit every Poki screen size ----------
+{
+  const SIZES = [[616, 346], [640, 360], [836, 470], [1031, 580], [896, 414], [360, 640], [360, 800], [414, 896], [768, 1024], [810, 1080]];
+  const OVS = ['levelsOv', 'gradOv', 'howOv', 'startOv', 'wPop', 'adOv'];
+  for (const [width, height] of SIZES) {
+    const page = await browser.newPage({ viewport: { width, height } });
+    await page.addInitScript(p => localStorage.setItem('chuteRhythm.v5.progress', p), JSON.stringify({ best: [], trained: true, seen: SEEN }));
+    await page.goto(URL);
+    const bad = [];
+    for (const id of OVS) {
+      await page.evaluate(id => { document.querySelectorAll('.ov').forEach(o => o.hidden = o.id !== id); }, id);
+      await page.waitForTimeout(80);
+      const fits = await page.evaluate(id => {
+        const r = document.querySelector('#' + id + ' .card').getBoundingClientRect(), st = document.getElementById('stage').getBoundingClientRect();
+        return r.top >= st.top - 1 && r.bottom <= st.bottom + 1 && r.left >= st.left - 1 && r.right <= st.right + 1;
+      }, id);
+      if (!fits) bad.push(id);
+    }
+    ok(bad.length === 0, `${width}x${height}: every card fits`, bad.join(','));
+    await page.evaluate(() => { document.querySelectorAll('.ov').forEach(o => o.hidden = o.id !== 'howOv'); });
+    await page.waitForTimeout(80);
+    ok(await page.evaluate(() => { const b = document.getElementById('howBtn'), r = b.getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === b; }), `${width}x${height}: how-to Start can be pressed`);
+    await page.close();
+  }
 }
 
 await browser.close();

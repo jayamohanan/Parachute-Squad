@@ -40,14 +40,15 @@ $('restartBtn').addEventListener('click',e=>{setDev(false);restart();e.currentTa
 addEventListener('keydown',e=>{ if(e.code==='KeyR'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&$('adOv').hidden&&$('shopOv').hidden){e.preventDefault();restart()} });
 $('startBtn').addEventListener('click',start);
 $('againBtn').addEventListener('click',start);
-$('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} });
+$('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} else showWorldPop(worldOf(curLevel)+1); });
 $('lvBtn').addEventListener('click',showLevels);
 $('menuBtn').addEventListener('click',e=>{setDev(false);showLevels();e.currentTarget.blur()});
 function stopRun(){ SFX.droneStop(); running=false; runId++; }
 let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });
-$('unlockAll').addEventListener('click',()=>{ prog.unlockAll=!prog.unlockAll; saveProg(); showLevels(true) });
+$('unlockAll').addEventListener('click',e=>{ prog.unlockAll=!prog.unlockAll; saveProg(); syncUnlockAll(); if(!$('levelsOv').hidden) showLevels(true); e.currentTarget.blur(); });
+function syncUnlockAll(){ $('unlockAll').textContent=prog.unlockAll?'Lock levels again':'Unlock all levels'; }
 function showLevels(keepWorld){
   if(!$('endOv').hidden) leaveResult();
   stopRun(); S=null; training=false; $('gradOv').hidden=true;
@@ -58,29 +59,35 @@ function showLevels(keepWorld){
   const vw=viewWorld;
   $('wName').textContent=`World ${vw+1} · ${WORLDS[vw].name}`;
   $('wPrev').disabled=vw===0; $('wNext').disabled=vw===WORLDS.length-1;
-  $('unlockAll').textContent=prog.unlockAll?'Lock levels again (testing)':'Unlock all levels (testing)';
+  syncUnlockAll();
   LEVELS.forEach((L,n)=>{ if(worldOf(n)!==vw) return;
     const b=document.createElement('button'), st=prog.stars[n]||0, open=unlocked(n);
     b.className='lv'+(n===nextUp?' next':''); b.disabled=!open; b.title=L.name;
-    b.innerHTML=`${open?n%PER_WORLD+1:'🔒'}<small>${open?'★'.repeat(st):''}</small>`;
+    b.innerHTML=`${open?levelLabel(n):'🔒'}<small>${open?[0,1,2].map(i=>`<span${i<st?'':' class="dim"'}>★</span>`).join(''):''}</small>`;
     if(n===0&&nextUp===0&&prog.trained){   // first visit after training: a tapping hand invites the player to Level 1
       b.insertAdjacentHTML('beforeend',`<span class="lvring"></span><span class="lvhand" aria-hidden="true"><svg viewBox="-14 -22 30 42"><path d="M-6,-16 A3,3 0 0 1 0,-16 L0,-4 L9,-2 Q14,0 13,8 L11,16 L-4,16 L-10,6 Q-12,1 -7,2 L-6,4 Z" fill="#fff" stroke="#132238" stroke-width="2.5" stroke-linejoin="round"/></svg></span>`); }
     b.addEventListener('click',()=>{curLevel=n; training=false; start()});
     g.appendChild(b);
   });
   refreshCoins();
-  const nw=vw+1, ts=worldStars(vw);
-  if(nw<WORLDS.length){ const open2=worldOpen(nw), canGate=!open2&&ts>=GATE_MIN;
+  const nw=vw+1, ts=totalStars(), need=worldNeed(nw);
+  $('w2').classList.remove('nudge','pulse');
+  if(nw<WORLDS.length){ const open2=worldOpen(nw), canGate=!open2&&ts>=need-GATE_NEAR;
     $('w2').innerHTML=`<span class="lock">${open2?'🔓':'🔒'}</span><div style="flex:1;min-width:0"><b>World ${nw+1} · ${WORLDS[nw].name}</b>
-      <span>${open2?'Unlocked! Tap › to go there.':`Collect ${W_NEED}★ in World ${vw+1} to unlock · you have ${ts}★`}</span></div>`+
-      (canGate?`<button class="gatebtn" id="gateBtn">▶ Unlock now</button>`:`<div class="bar2"><i style="width:${Math.min(100,ts/W_NEED*100).toFixed(0)}%"></i></div>`);
+      ${open2?'':`<span>${ts}/${need}★</span>`}</div>`+
+      (canGate?`<button class="gatebtn" id="gateBtn">${AD_ICO} Unlock now</button>`:`<div class="bar2"><i style="width:${Math.min(100,ts/need*100).toFixed(0)}%"></i></div>`);
     if(canGate) $('gateBtn').onclick=()=>watchAd(()=>{ prog.gate[nw]=1; saveProg(); viewWorld=nw; showLevels(true); });
-  } else $('w2').innerHTML=`<span class="lock">🚧</span><div><b>More worlds coming</b><span>World ${vw+1}: ${ts}★ of 30</span></div>`;
+    $('w2').onclick=open2?()=>{ viewWorld=nw; showLevels(true); }:e=>{ if(e.target.id!=='gateBtn') nudgeLocked(); };
+    if(open2&&worldStars(nw)===0) $('w2').classList.add('pulse');   // pulses until the player earns a star there
+  } else { $('w2').innerHTML=`<span class="lock">🚧</span><div><b>More worlds coming</b><span>World ${vw+1}: ${worldStars(vw)}★ of 30</span></div>`; $('w2').onclick=null; }
+  $('w2').classList.toggle('tappable',!!$('w2').onclick);
   $('levelsOv').hidden=false; draw();
+}
+function nudgeLocked(){   // tapped the locked next-world row: lock shakes, star count flashes
+  const r=$('w2'); r.classList.remove('nudge'); void r.offsetWidth; r.classList.add('nudge'); SFX.clonk();
 }
 function applyMode(){
   document.body.classList.toggle('levels',settings.mode==='levels');
-  $('againBtn').textContent=settings.mode==='levels'?'Retry':'Jump again';
 }
 function enterMode(){
   applyMode(); stopRun(); S=null; setPanel(false); $('shopOv').hidden=true; $('gradOv').hidden=true;

@@ -34,6 +34,9 @@
       <div class="seg" data-key="sound"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
     <button class="vbtn" id="restartBtn" title="Restart (R)">↻ Restart</button>
     <button class="vbtn lvonly" id="menuBtn">☰ Levels</button>
+    <button class="vbtn lvonly" id="unlockAll">Unlock all levels</button>
+    <button class="vbtn lvonly" id="addCoins">+1000 coins</button>
+    <button class="vbtn lvonly" id="resetProg">Reset progress</button>
     <button class="vbtn sbx" id="vbtn" aria-expanded="false" aria-controls="vpanel">Variations <span class="badge" id="vcount" hidden>0</span></button>
   </div>
   <div class="stage" id="stage">
@@ -60,16 +63,11 @@
     <div class="ov" id="levelsOv" hidden>
       <div class="card lvcard">
         <h1>Chute <span>Rhythm</span></h1>
-        <p class="tagline">Open your chute at the <b>last second</b>.</p>
         <div class="ecorow"><span class="coinpill"><i class="coin"></i><span id="coinN">0</span></span><button class="btn ghost sm" id="shopOpen">Store</button></div>
         <div class="wnav"><button class="wbtn" id="wPrev" aria-label="Previous world">‹</button><p class="lvsub" id="wName">World 1 · Training ground</p><button class="wbtn" id="wNext" aria-label="Next world">›</button></div>
         <div class="lvgrid" id="lvgrid"></div>
         <div class="w2" id="w2"></div>
         <button class="qbtn" id="howOpen" aria-label="How to play">?</button>
-        <p class="lvhint">Every miss costs a ❤ · hearts left become ★</p>
-        <button class="resetbtn" id="resetProg">Reset progress</button>
-        <button class="resetbtn" id="unlockAll">Unlock all levels (testing)</button>
-        <button class="resetbtn" id="addCoins">+1000 coins (testing)</button>
       </div>
     </div>
     <div class="ov" id="gradOv" hidden>
@@ -104,7 +102,7 @@
         <div class="shophead"><h2>Store</h2><span class="coinpill"><i class="coin"></i><span id="shopCoins">0</span></span></div>
         <div class="tabs" role="tablist"><button class="tab on" data-tab="chute">Chutes</button><button class="tab" data-tab="diver">Divers</button><button class="tab" data-tab="plane">Planes</button></div>
         <div class="shopgrid" id="shopGrid"></div>
-        <div class="shopfoot"><button class="btn sm" id="adCoins">▶ +100 <i class="coin sm"></i></button><button class="btn ghost sm" id="shopBack">Back</button></div>
+        <div class="shopfoot"><button class="btn sm" id="adCoins"><i class="ico i-ad" role="img" aria-label="Watch ad"></i> +100 <i class="coin sm"></i></button><button class="btn ghost sm" id="shopBack">Back</button></div>
       </div>
     </div>
     <div class="ov end" id="endOv" hidden>
@@ -121,14 +119,19 @@
           <div class="strip" id="strip"></div>
           <div class="coinrow lvonly" id="rCoins"></div>
           <div class="track lvonly" id="rTrack" hidden></div>
-          <div class="w2 wend lvonly" id="rWorld" hidden></div>
           <div class="legend"><span><i style="background:#2fd88a"></i>Perfect</span><span><i style="background:#ffc9d4"></i>Miss</span><span><i style="background:#ff6b4a"></i>Splat</span></div>
-          <div class="actions">
-            <button class="btn lvonly" id="nextBtn">Next level</button>
-            <button class="btn" id="againBtn">Jump again</button>
-            <button class="btn ghost lvonly" id="lvBtn">Levels</button>
-            <span class="hint" id="spaceHint">or press Space</span></div>
+          <div class="actions iconbtns">
+            <button class="btn lvonly" id="nextBtn"></button>
+            <button class="btn" id="againBtn"><i class="ico lg i-retry" role="img" aria-label="Retry"></i></button>
+            <button class="btn ghost lvonly" id="lvBtn"><i class="ico lg i-levels" role="img" aria-label="Levels"></i></button></div>
         </div>
+      </div>
+    </div>
+    <div class="ov" id="wPop" hidden>
+      <div class="card wpop">
+        <h1 id="wpTitle"></h1>
+        <p id="wpNeed"></p>
+        <div class="actions"><button class="btn" id="rGate" hidden><i class="ico i-ad" role="img" aria-label="Watch ad"></i> Unlock now</button><button class="btn ghost" id="wpLevels">Levels</button><button class="btn ghost" id="wpClose">Close</button></div>
       </div>
     </div>
     <div class="ov" id="adOv" hidden>

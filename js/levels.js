@@ -52,7 +52,7 @@ const Hi=0.24;
 const V=h=>({h:Math.max(h,Lo),vent:true}), P=h=>({h,plat:true}), F=h=>({h,faulty:true});
 const L3=(name,tempo,d,o={})=>Object.assign({name,tempo,dummies:0,hearts:3,d},o);
 LEVELS.push(
-  // World 2 · City rooftops — taller roofs, Fast tempo, thin bands; steam vents from 2-4
+  // World 2 · City rooftops — taller roofs, Fast tempo, thin bands; steam vents from Level 14
   L3('Rush hour','med',[0,Mi,Ta,Mi,0,Ta,Hi,Ta,Mi,0]),
   L3('Fast lane','fast',[0,Lo,0,Lo,Mi,0,Mi,Lo,0,Mi]),
   L3('High rise','fast',[Mi,Ta,Hi,Ta,Mi,Ta,Hi,Mi,Ta,Hi]),
@@ -100,9 +100,9 @@ LEVELS.push(
 const WORLDS=[
   {name:'Training ground'},{name:'City rooftops'},{name:'Base elevators'},{name:'Cloud cover'},{name:'Sabotage'},
 ];
-const PER_WORLD=10, W_NEED=25;   // stars needed in a world to unlock the next one (out of 30)
+const PER_WORLD=10, W_NEED=25;   // running star total opens worlds: World 2 at 25★, World 3 at 50★, World 4 at 75★... stars are never spent
 const worldOf=n=>Math.floor(n/PER_WORLD);
-const levelLabel=n=>`${worldOf(n)+1}-${n%PER_WORLD+1}`;
+const levelLabel=n=>n+1;   // levels count on across worlds: World 2 starts at Level 11
 let training=false, trainingThen='level1';
 function startTraining(then){ training=true; trainingThen=then; start(); }
 let curLevel=0;
@@ -115,10 +115,10 @@ const saveProg=()=>store.set(PKEY,JSON.stringify(prog));
 // everything can be bought with coins alone (players with ad blockers can still get it all).
 const PRICE={chute:{common:100,rare:250,epic:600,legendary:1200},diver:{common:200,rare:450,epic:900,legendary:2000},plane:{rare:900,epic:1600,legendary:2500}};
 const AD_NEED={common:1,rare:3};                      // epic / legendary: coins only
-const AD_COINS=100, AD_COINS_CD=120000, GATE_MIN=20;  // store ad, cooldown (ms); "unlock now" offered from 20★
+const AD_COINS=100, AD_COINS_CD=120000, GATE_NEAR=5;  // store ad, cooldown (ms); "unlock now" offered within 5★ of the gate
 const TRACK=[['plane','biplane'],['chute','watermelon'],['diver','robot'],['plane','cargo'],['chute','camo'],
   ['diver','astronaut'],['plane','blimp'],['chute','jellyfish'],['diver','chicken'],['plane','stealth']];
-// v6.7: each reward belongs to a fixed level (5th and 10th of every world), so the screen can say "Unlocks at Level 1-10"
+// v6.7: each reward belongs to a fixed level (5th and 10th of every world), so the screen can say "Unlocks at Level 10"
 const REWARD_LV=[4,9,14,19,24,29,34,39,44,49];
 function ensureEco(){
   if(typeof prog.coins!=='number') prog.coins=0;
@@ -140,6 +140,8 @@ function trackItem(){   // current reward on the track, skipping anything alread
   return prog.trackDone<TRACK.length?TRACK[prog.trackDone]:null;
 }
 const worldStars=w=>{let a=0;for(let n=w*PER_WORLD;n<(w+1)*PER_WORLD;n++)a+=prog.stars[n]||0;return a};
-const worldOpen=w=>w===0||!!prog.unlockAll||!!(prog.gate&&prog.gate[w])||worldStars(w-1)>=W_NEED;
+const totalStars=()=>LEVELS.reduce((a,_,n)=>a+(prog.stars[n]||0),0);
+const worldNeed=w=>w*W_NEED;
+const worldOpen=w=>w===0||!!prog.unlockAll||!!(prog.gate&&prog.gate[w])||totalStars()>=worldNeed(w);
 const unlocked=n=>{ if(n<0||n>=LEVELS.length) return false; if(prog.unlockAll) return true;
   const w=worldOf(n); if(n%PER_WORLD===0) return worldOpen(w); return (prog.stars[n-1]||0)>0; };
