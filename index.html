@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Chute Rhythm</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lilita+One&family=Nunito:wght@500;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body class="devclosed">
+<div id="app">
+  <button class="devtog" id="devTog" aria-expanded="false" aria-label="Show controls" title="Controls">⚙</button>
+  <div class="bar">
+    <div class="brand">Chute <span>Rhythm</span></div>
+    <div class="grp"><label>Mode</label>
+      <div class="seg" data-key="mode"><button data-v="levels">Levels</button><button data-v="sandbox">Sandbox</button></div></div>
+    <div class="grp sbx"><label>Ground</label>
+      <div class="seg" data-key="ground">
+        <button data-v="flat">Flat</button><button data-v="slope">Slope</button><button data-v="steps">Steps</button>
+      </div></div>
+    <div class="grp sbx"><label>Tempo</label>
+      <div class="seg" data-key="tempo">
+        <button data-v="slow">Slow</button><button data-v="med">Med</button><button data-v="fast">Fast</button>
+      </div></div>
+    <div class="grp sbx"><label>Band</label>
+      <div class="seg" data-key="band">
+        <button data-v="normal">Normal</button><button data-v="thin">Thin</button><button data-v="razor">Razor</button>
+      </div></div>
+    <div class="grp sbx"><label>Count-in</label>
+      <div class="seg" data-key="countIn"><button data-v="3">3</button><button data-v="5">5</button></div></div>
+    <div class="grp"><label>Sound</label>
+      <div class="seg" data-key="sound"><button data-v="on">On</button><button data-v="off">Off</button></div></div>
+    <button class="vbtn" id="restartBtn" title="Restart (R)">↻ Restart</button>
+    <button class="vbtn lvonly" id="menuBtn">☰ Levels</button>
+    <button class="vbtn sbx" id="vbtn" aria-expanded="false" aria-controls="vpanel">Variations <span class="badge" id="vcount" hidden>0</span></button>
+  </div>
+  <div class="stage" id="stage">
+    <canvas id="cv"></canvas>
+    <div class="vpanel" id="vpanel" hidden>
+      <div class="vrow"><div><b>Moving platforms</b><span>About 1 in 3 landings is a lift that bobs up and down. Any tap freezes it.</span></div>
+        <div class="seg" data-key="platforms"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Faulty chutes</b><span>About 1 in 4 divers jump with a chute open. It always pops. Tap once after the pop.</span></div>
+        <div class="seg" data-key="faulty"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Heavy divers</b><span>About 1 in 4 divers are big and fall faster.</span></div>
+        <div class="seg" data-key="heavy"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Plane dive</b><span>The plane dips lower mid-run, so falls get shorter, then climbs back.</span></div>
+        <div class="seg" data-key="dive"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Updraft vents</b><span>Steam on some rooftops slows divers above it.</span></div>
+        <div class="seg" data-key="vents"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Clouds</b><span>A low cloud bank. Divers only come out just above their band.</span></div>
+        <div class="seg" data-key="clouds"><button data-v="off">Off</button><button data-v="patchy">Patchy</button><button data-v="full">Full</button></div></div>
+      <div class="vrow"><div><b>Diver marker</b><span>Ring, arrow and guide line on the diver you'll tap next.</span></div>
+        <div class="seg" data-key="ring"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <div class="vrow"><div><b>Radar</b><span>Radar posts and one flat radar line above the tallest band. Opening above it gets you spotted. In Levels (from Level 5) that ends the level.</span></div>
+        <div class="seg" data-key="radar"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
+      <p class="vnote">Changes apply to the next jump. Every jump is checked so 12/12 perfect is always possible.</p>
+    </div>
+    <div class="ov" id="levelsOv" hidden>
+      <div class="card lvcard">
+        <h1>Chute <span>Rhythm</span></h1>
+        <p class="tagline">Open your chute at the <b>last second</b>.</p>
+        <div class="ecorow"><span class="coinpill"><i class="coin"></i><span id="coinN">0</span></span><button class="btn ghost sm" id="shopOpen">Store</button></div>
+        <div class="wnav"><button class="wbtn" id="wPrev" aria-label="Previous world">‹</button><p class="lvsub" id="wName">World 1 · Training ground</p><button class="wbtn" id="wNext" aria-label="Next world">›</button></div>
+        <div class="lvgrid" id="lvgrid"></div>
+        <div class="w2" id="w2"></div>
+        <button class="qbtn" id="howOpen" aria-label="How to play">?</button>
+        <p class="lvhint">Every miss costs a ❤ · hearts left become ★</p>
+        <button class="resetbtn" id="resetProg">Reset progress</button>
+        <button class="resetbtn" id="unlockAll">Unlock all levels (testing)</button>
+        <button class="resetbtn" id="addCoins">+1000 coins (testing)</button>
+      </div>
+    </div>
+    <div class="ov" id="gradOv" hidden>
+      <div class="card gradcard">
+        <div class="badge"><canvas id="gradCv" width="640" height="360" aria-label="Agent badge"></canvas><div class="stamp" id="gradStamp">READY!</div></div>
+        <div class="strip" id="gradStrip"></div>
+        <div class="coinrow" id="gradCoins"></div>
+        <div class="actions" id="gradActs"></div>
+      </div>
+    </div>
+    <div class="ov" id="howOv" hidden>
+      <div class="card howcard">
+        <canvas id="howCv" width="640" height="800" aria-label="Open too early and you lose a heart. Open in the green band for a perfect landing. Open too late and you crash."></canvas>
+        <button class="btn" id="howBtn">Start</button>
+        <button class="btn ghost" id="howBack" hidden>Back</button>
+      </div>
+    </div>
+    <div class="ov" id="startOv" hidden>
+      <div class="card">
+        <h1>Chute <span>Rhythm</span></h1>
+        <p>Tap anywhere (or press Space) to open the chute of the <b>highlighted diver</b>. Open it as late as you dare, inside the <b>green band</b>.</p>
+        <ul>
+          <li>The first divers are crash-test dummies. Use them to find the beat.</li>
+          <li>Goal: 12 out of 12 perfect.</li>
+          <li>Open <b>Variations</b> to mix in platforms, faulty chutes, heavy divers and more.</li>
+        </ul>
+        <button class="btn" id="startBtn">Start the jump</button>
+      </div>
+    </div>
+    <div class="ov" id="shopOv" hidden>
+      <div class="card shopcard">
+        <div class="shophead"><h2>Store</h2><span class="coinpill"><i class="coin"></i><span id="shopCoins">0</span></span></div>
+        <div class="tabs" role="tablist"><button class="tab on" data-tab="chute">Chutes</button><button class="tab" data-tab="diver">Divers</button><button class="tab" data-tab="plane">Planes</button></div>
+        <div class="shopgrid" id="shopGrid"></div>
+        <div class="shopfoot"><button class="btn sm" id="adCoins">▶ +100 <i class="coin sm"></i></button><button class="btn ghost sm" id="shopBack">Back</button></div>
+      </div>
+    </div>
+    <div class="ov end" id="endOv" hidden>
+      <div class="sheet">
+        <div class="result">
+          <div class="rtop">
+            <div><div class="mode" id="rMode"></div><div class="failtitle" id="rFail" hidden>LEVEL FAILED</div><div class="verdict" id="rVerdict"></div><div class="rstars lvonly" id="rStars"></div></div>
+            <div class="rbadge" id="rBadge" hidden>NEW BEST!</div>
+          </div>
+          <div class="big"><strong id="rPerf">0</strong><span id="rTotal">/ 12</span></div>
+          <div class="sub">Perfect landings</div>
+          <div class="pbline" id="rPB"></div>
+          <div class="stats" id="stats"></div>
+          <div class="strip" id="strip"></div>
+          <div class="coinrow lvonly" id="rCoins"></div>
+          <div class="track lvonly" id="rTrack" hidden></div>
+          <div class="w2 wend lvonly" id="rWorld" hidden></div>
+          <div class="legend"><span><i style="background:#2fd88a"></i>Perfect</span><span><i style="background:#ffc9d4"></i>Miss</span><span><i style="background:#ff6b4a"></i>Splat</span></div>
+          <div class="actions">
+            <button class="btn lvonly" id="nextBtn">Next level</button>
+            <button class="btn" id="againBtn">Jump again</button>
+            <button class="btn ghost lvonly" id="lvBtn">Levels</button>
+            <span class="hint" id="spaceHint">or press Space</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="ov" id="adOv" hidden>
+      <div class="card adcard"><div class="adlbl">AD</div><div class="adbox">Ad playing…</div><div class="adbar"><i id="adFill"></i></div>
+        <button class="resetbtn" id="adClose">Close (no reward)</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/core.js"></script>
+<script src="js/sfx.js"></script>
+<script src="js/dev.js"></script>
+<script src="js/levels.js"></script>
+<script src="js/world.js"></script>
+<script src="js/input.js"></script>
+<script src="js/sim.js"></script>
+<script src="js/render.js"></script>
+<script src="js/cards.js"></script>
+<script src="js/loop.js"></script>
+<script src="js/result.js"></script>
+<script src="js/store.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>

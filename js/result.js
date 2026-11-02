@@ -1,0 +1,198 @@
+// ---------- result ----------
+const NAMES={platforms:'Platforms',faulty:'Faulty chutes',heavy:'Heavy divers',dive:'Plane dive',vents:'Vents'};
+let resultSeq=0;   // bumps every time a result is shown or left, so delayed effects from an old result never fire
+// Every delayed result-screen effect goes through rt(). Leaving the result (Next / Retry / Levels) cancels them all and
+// cuts any result sounds still ringing. All progress (stars, coins, wins, unlocks) is saved the moment the result
+// opens or a button is pressed — never at the end of an animation — so skipping can't lose anything.
+let resultTimers=[];
+function rt(fn,ms){ const id=setTimeout(()=>{ resultTimers=resultTimers.filter(x=>x!==id); fn(); },ms); resultTimers.push(id); return id; }
+function leaveResult(){ resultSeq++; for(const id of resultTimers) clearTimeout(id); resultTimers=[]; SFX.cutAll(); }
+function showEnd(){
+  resultSeq++; $('strip').className='strip'; $('strip').style.minHeight='';
+  if(S.training){   // training never fails. First time (and "Practice again" from the card): graduation card. From "?": back to the levels.
+    const grad=trainingThen==='level1'||trainingThen==='grad';
+    training=false; prog.trained=true;
+    if(grad){ const hs=S.divers.filter(d=>!d.dummy), perf=hs.filter(d=>d.rating==='perfect').length;
+      let gift=0; if(!prog.gradGift){ prog.gradGift=true; gift=100; prog.coins+=gift; }
+      saveProg(); showGrad(perf,hs,gift); return; }
+    saveProg(); curLevel=0; showLevels(); return;
+  }
+  if(S.level!=null) return showLevelEnd();
+  $('rTotal').textContent='/ '+S.humansN;
+  const humans=S.divers.filter(d=>!d.dummy);
+  const cls=d=>(d.outcome==='splat'||d.outcome==='crash')?'splat':d.rating==='perfect'?'perfect':'miss';
+  const perf=humans.filter(d=>cls(d)==='perfect').length;
+  const close=humans.filter(d=>cls(d)==='miss').length;
+  const splats=humans.filter(d=>cls(d)==='splat').length;
+  const c=S.cfg;
+  const vars=VKEYS.filter(k=>k!=='clouds'&&c[k]==='on').map(k=>NAMES[k]);
+  if(c.clouds!=='off') vars.push(c.clouds==='full'?'Full clouds':'Patchy clouds');
+  const gName={flat:'Flat',slope:'Slope',steps:'Steps'}[S.mode], tName={slow:'Slow',med:'Med',fast:'Fast'}[S.tempoKey];
+  const bName={normal:'',thin:'Thin band',razor:'Razor band'}[c.band]||'';
+  $('rMode').textContent=[`${gName} · ${tName}`].concat(bName?[bName]:[],vars).join(' · ');
+  const key='chuteRhythm.v3.best.'+[c.ground,c.tempo,c.band,c.platforms,c.faulty,c.heavy,c.dive,c.vents,c.clouds].join('-');
+  const prev=+(store.get(key)??-1), isBest=perf>prev;
+  if(isBest) store.set(key,String(perf));
+  $('rPerf').textContent=perf;
+  $('rVerdict').textContent=
+    perf===12?'Flawless. Every single one.':
+    splats>=6?'The ground is winning':
+    splats>=3?'Paperwork for the insurance team':
+    perf>=10?'So close to all twelve':
+    close>=4?'Living dangerously':
+    splats===0?'Everyone walked away':'Mostly in one piece';
+  $('rBadge').hidden=!(isBest&&prev>=0); $('rBadge').textContent='NEW BEST!';
+  $('againBtn').className='btn'; $('spaceHint').textContent='or press Space';
+  $('rPB').textContent=prev<0?'First jump with this setup.':isBest?`Up from ${prev}/12 on this setup.`:`Best on this setup: ${prev}/12`;
+  $('stats').innerHTML=[['p',perf,'Perfect'],['c',close,'Misses'],['x',splats,'Splats'],['',S.best,'Best streak']]
+    .map(([cl,v,l])=>`<div class="stat ${cl}"><strong>${v}</strong>${l}</div>`).join('');
+  $('strip').style.setProperty('--n',S.humansN);
+  $('strip').innerHTML=humans.map((d,n)=>{
+    const cl=cls(d), tag=d.faulty?'pop':d.heavy?'big':d.plat?'lift':d.vent?'vent':'';
+    return `<div class="tile ${cl}" style="--d:${(n*0.06).toFixed(2)}s" title="${cl}">${TILE_ICON[cl==='perfect'?'perfect':'miss']}${tag?`<i>${tag}</i>`:''}</div>`;
+  }).join('');
+  SFX.end(isBest&&prev>=0);
+  $('endOv').hidden=false;$('endOv').scrollTop=0;endShownAt=performance.now();
+}
+
+// v6.7: one icon per meaning. Perfect = small open chute; any landing that cost a life = 💔;
+// after the last life is gone nothing counts any more (grey dot), so a fail always shows exactly the lives that were lost.
+const CHUTE_ICON='<svg class="tchute" viewBox="-12 -12 24 24" aria-hidden="true"><path d="M-10.5,-2 A10.5,8.5 0 0 1 10.5,-2 Z" fill="#fff" stroke="#0d4a2c" stroke-width="1.6" stroke-linejoin="round"/><path d="M-3.5,-2 A3.5,8.5 0 0 1 3.5,-2" fill="none" stroke="#0d4a2c" stroke-width="1.2"/><path d="M-10,-2 L0,8 M10,-2 L0,8" stroke="#0d4a2c" stroke-width="1.2" fill="none"/><circle cx="0" cy="9" r="2.4" fill="#0d4a2c"/></svg>';
+const TILE_ICON={perfect:CHUTE_ICON,miss:'💔',none:'·'};
+let nextPending=false;   // a next world is being unlocked on this result screen (button appears when the animation ends)
+function showLevelEnd(){
+  const n=S.level, L=LEVELS[n], N=S.humansN, humans=S.divers.filter(d=>!d.dummy);
+  const cls=d=>d.rating==='perfect'?'perfect':d.lost?'miss':'none';
+  const perf=humans.filter(d=>cls(d)==='perfect').length, close=humans.filter(d=>cls(d)==='miss').length;
+  const passed=!S.failed;
+  const st=passed?Math.max(0,S.hearts):0, prevSt=prog.stars[n]||0;   // stars = hearts left
+  const nw=worldOf(n)+1, worldEnd=n%PER_WORLD===PER_WORLD-1&&nw<WORLDS.length;
+  const wasOpen=worldEnd&&worldOpen(nw);
+  if(st>prevSt) prog.stars[n]=st;
+  prog.best[n]=Math.max(prog.best[n]||0,perf);
+  const earned=passed?Math.max(0,st-prevSt)*20+10+(S.best>=5?10:0):0;   // new stars x20, +10 finished, +10 streak of 5+
+  prog.coins+=earned; if(passed&&prevSt===0) prog.wins++;
+  saveProg();   // everything (stars, coins, wins, a world opened by these stars) is saved now; animations only show it
+  const opensNow=worldEnd&&passed&&!wasOpen&&worldOpen(nw);
+  renderCoinRow(earned); if(passed) renderTrack(); else $('rTrack').hidden=true;
+  $('rMode').textContent=`World ${worldOf(n)+1} · Level ${n%PER_WORLD+1}`;
+  $('endOv').querySelector('.result').classList.toggle('lost',!passed);
+  $('rFail').hidden=passed;
+  let doneAt=600;   // when the result animations are over (ms)
+  if(passed){
+    // hearts first, then each one flips into a star: kept hearts -> gold stars, lost hearts -> empty stars
+    $('rStars').innerHTML=[0,1,2].map(i=>`<span class="hs ${i<st?'on':'off'}" style="--d:${(0.45+i*0.32).toFixed(2)}s"><b class="h">${i<st?'❤':'♡'}</b><b class="s">★</b></span>`).join('');
+    // the star chimes are the win jingle (no extra jingle on top)
+    if(!reduceMotion) for(let i=0;i<st;i++) rt(()=>SFX.star(i),(0.45+i*0.32+0.3)*1000); else SFX.end(st>prevSt);
+    doneAt=(0.45+2*0.32+0.3+0.4)*1000;
+  } else {
+    $('rStars').innerHTML=[0,1,2].map(i=>`<span class="bh" style="--d:${(0.15+i*0.12).toFixed(2)}s">💔</span>`).join('');
+  }
+  $('rPerf').textContent=perf; $('rTotal').textContent='/ '+N;
+  $('rVerdict').textContent=!passed?(L.hearts?'No more lives':'Nobody splats on level 1. Try again!'):
+    st===3?'Flawless. Every single one.':st===2?'One miss from flawless':'Passed!';
+  $('rBadge').hidden=!(st>prevSt&&prevSt>0); $('rBadge').textContent=st>prevSt?'NEW STARS!':'NEW BEST!';
+  $('rPB').textContent=!passed?(L.hearts?`Every landing that isn't perfect costs a ❤. You had ${L.hearts}.`:'Land every diver without a splat to pass.'):
+    st<3?`${S.misses} miss${S.misses>1?'es':''}. Land all ${N} perfect for ★★★`:'Every diver landed perfectly.';
+  $('stats').innerHTML=[['p',perf,'Perfect'],['c',close,'Lives lost'],['',S.best,'Best streak']]
+    .map(([cl,v,l])=>`<div class="stat ${cl}"><strong>${v}</strong>${l}</div>`).join('');
+  const strip=$('strip'); strip.className='strip'; strip.style.minHeight='';
+  strip.style.setProperty('--n',N);
+  strip.innerHTML=humans.map((d,i)=>{const c=cls(d);
+    return `<div class="tile ${c}" style="--d:${(i*0.06).toFixed(2)}s">${TILE_ICON[c]}</div>`}).join('');
+  if(passed&&perf===N){   // every landing perfect: the tiles ripple away and "ALL PERFECT!" takes their place
+    const seq=resultSeq, t0=N*60+250+450, t1=N*35+330;
+    rt(()=>{ if(seq!==resultSeq) return;
+      strip.querySelectorAll('.tile').forEach((t,i)=>{ t.style.setProperty('--d2',(i*0.035).toFixed(3)+'s'); t.classList.add('out'); });
+      rt(()=>{ if(seq!==resultSeq) return;
+        const chute='<svg viewBox="-20 -20 40 40" aria-hidden="true"><path d="M-17,-2 A17,13 0 0 1 17,-2 Z" fill="#ffd23f" stroke="#a87400" stroke-width="2"/><path d="M-6,-2 A6,13 0 0 1 6,-2 Z" fill="#fff6c2"/><path d="M-16,-2 L0,14 M16,-2 L0,14 M0,-2 L0,14" stroke="#a87400" stroke-width="1.6"/><circle cx="0" cy="16" r="3" fill="#ffd23f" stroke="#a87400" stroke-width="1.5"/></svg>';
+        strip.style.minHeight=strip.offsetHeight+'px'; strip.className='strip ap';   // keep the height so buttons don't jump
+        strip.innerHTML=`<div class="allperf">${chute}<span>ALL PERFECT!</span>${chute}</div>`+
+          Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2, r=70+Math.random()*60;
+            return `<span class="spark" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r*0.45).toFixed(0)}px;--sd:${(Math.random()*0.15).toFixed(2)}s">✦</span>`}).join('');
+        SFX.chord();   // one warm chord (v6.7: was a second jingle + 4 rising high notes)
+      },t1);
+    },t0);
+    doneAt=Math.max(doneAt,t0+t1+1600);
+  }
+  // buttons; the last level of a world always shows the way to the next world
+  nextPending=false;
+  const hasNext=passed&&n<LEVELS.length-1&&unlocked(n+1)&&!opensNow;
+  $('nextBtn').hidden=!hasNext; $('nextBtn').classList.remove('popbtn');
+  $('nextBtn').textContent=worldEnd?`World ${nw+1} ▶`:'Next level';
+  $('againBtn').className=hasNext?'btn ghost':'btn';
+  $('spaceHint').textContent=hasNext||opensNow?'or press Space for next':'or press Space to retry';
+  $('rWorld').hidden=true;
+  if(worldEnd&&passed){
+    // before the unlock animation the row shows the stars from BEFORE this run (and no ad: the stars already did it)
+    renderWorldRow(nw,wasOpen?'open':'locked',opensNow?worldStars(nw-1)-Math.max(0,st-prevSt):null);
+    if(opensNow){ nextPending=true; const seq=resultSeq; rt(()=>{ if(seq===resultSeq) playWorldUnlock(nw); },reduceMotion?300:doneAt); }
+  }
+  $('endOv').hidden=false;$('endOv').scrollTop=0;endShownAt=performance.now();
+}
+// the next-world row on the result screen of a world's last level
+function renderWorldRow(nw,mode,before){
+  const el=$('rWorld'), ts=before!=null?before:worldStars(nw-1), need=Math.max(0,W_NEED-ts), canGate=mode==='locked'&&before==null&&ts>=GATE_MIN;
+  el.hidden=false; el.className='w2 wend'+(mode==='open'?' open':'');
+  el.innerHTML=`<span class="lock">${mode==='open'?'🔓':'🔒'}</span><div style="flex:1;min-width:0"><b>World ${nw+1} · ${WORLDS[nw].name}</b>
+    <span>${mode==='open'?'Unlocked!':`${need} more ★ to unlock · ${ts}/${W_NEED}★`}</span></div>`+
+    (canGate?`<button class="gatebtn" id="rGate">▶ Unlock now</button>`
+      :mode==='open'?'':`<div class="bar2"><i style="width:${Math.min(100,ts/W_NEED*100).toFixed(0)}%"></i></div>`);
+  if(canGate) $('rGate').onclick=()=>watchAd(()=>{ prog.gate[nw]=1; saveProg(); nextPending=true; playWorldUnlock(nw); });
+}
+function playWorldUnlock(nw){   // lock shakes, opens, UNLOCKED! stamp + confetti, then the next-world button pops in
+  const el=$('rWorld'), seq=resultSeq, lock=el.querySelector('.lock'); if(lock) lock.classList.add('shake');
+  rt(()=>{ if(seq!==resultSeq) return;
+    renderWorldRow(nw,'open'); el.classList.add('justopen');
+    const cols=['#ff5a36','#ffd23f','#2fd88a','#4dabf7','#e8417a','#ffffff'];
+    el.insertAdjacentHTML('beforeend','<div class="stamp">UNLOCKED!</div>'+(reduceMotion?'':Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*240-40).toFixed(0)}px;--y:${(-Math.random()*80-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('')));
+    SFX.worldOpen();
+    const b=$('nextBtn'); b.textContent=`World ${nw+1} ▶`; b.hidden=false; b.classList.add('popbtn');
+    $('againBtn').className='btn ghost'; nextPending=false;
+  },reduceMotion?0:550);
+}
+
+// ---------- result screen: coins + reward track ----------
+function renderCoinRow(earned){
+  const el=$('rCoins'); if(!earned){ el.innerHTML=''; return; }
+  el.innerHTML=`<i class="coin"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">▶ ×2</button>`;
+  $('dblBtn').onclick=()=>watchAd(()=>{ prog.coins+=earned; saveProg(); $('rCoinN').textContent=earned*2; const b=$('dblBtn'); b.disabled=true; b.textContent='Doubled!'; });
+}
+function drawSilhouette(cv,kind,id,frac){
+  const off=document.createElement('canvas'); off.width=cv.width; off.height=cv.height; itemThumb(off,kind,id);
+  const g=cv.getContext('2d'); g.clearRect(0,0,cv.width,cv.height);
+  g.drawImage(off,0,0); g.globalCompositeOperation='source-in'; g.fillStyle='#0b1526'; g.fillRect(0,0,cv.width,cv.height); g.globalCompositeOperation='source-over';
+  if(frac>0){ const h=cv.height*Math.min(1,frac); g.save(); g.beginPath(); g.rect(0,cv.height-h,cv.width,h); g.clip(); g.drawImage(off,0,0); g.restore(); }
+}
+function celebrateClaim(el,kind,id,obj){   // item pops out, rays, UNLOCKED! stamp, confetti, Equipped; then the next reward
+  const seq=resultSeq, cols=['#ff5a36','#ffd23f','#2fd88a','#4dabf7','#e8417a','#ffffff'];
+  el.className='track reveal';
+  el.innerHTML=`<div class="tcan"><div class="rays"></div><canvas width="136" height="136"></canvas></div>
+    <div style="flex:1;min-width:0"><div class="tt">${obj.name}</div><span class="eq">✓ Equipped</span></div>
+    <div class="stamp">UNLOCKED!</div>`+
+    Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*220-60).toFixed(0)}px;--y:${(-Math.random()*90-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('');
+  itemThumb(el.querySelector('canvas'),kind,id);
+  SFX.end(true); rt(()=>SFX.star(2),180);
+  rt(()=>{ if(seq!==resultSeq) return; el.classList.add('fadeout');
+    rt(()=>{ if(seq!==resultSeq) return; renderTrack(); },300); },1900);
+}
+function renderTrack(){
+  const el=$('rTrack'), it=trackItem(); if(!it||prog.rlv>=REWARD_LV.length){ el.hidden=true; return; }
+  const [kind,id]=it, obj=LISTS[kind].find(x=>x.id===id), kn=KIND_NAME[kind];
+  const lv=REWARD_LV[prog.rlv], prev=prog.rlv?REWARD_LV[prog.rlv-1]:-1, span=lv-prev;
+  let got=0; for(let i=prev+1;i<=lv;i++) if(prog.stars[i]>0) got++;
+  const due=prog.stars[lv]>0, free=prog.rlv===0, justWon=S&&S.level>prev&&S.level<=lv&&!S.failed;
+  el.hidden=false; el.className='track'+(due?' reveal':'');
+  el.innerHTML=`<canvas width="136" height="136"></canvas><div style="flex:1;min-width:0">`+(due
+    ?`<div class="tt">New ${kn}: ${obj.name}!</div><div class="ts">${free?'A free gift for you':'Skip it and it waits in the Store'}</div><div class="tacts"></div>`
+    :`<div class="tt">Next ${kn}</div><div class="ts">Unlocks at Level ${levelLabel(lv)}</div><div class="tbar"><i style="width:${(justWon?Math.max(0,got-1):got)/span*100}%"></i></div>`)+`</div>`;
+  drawSilhouette(el.querySelector('canvas'),kind,id,due?1:got/span);
+  if(!due){ requestAnimationFrame(()=>requestAnimationFrame(()=>{ const i=el.querySelector('.tbar i'); if(i) i.style.width=(got/span*100)+'%'; })); return; }
+  const used=()=>{ prog.trackDone++; prog.rlv++; saveProg(); };
+  const acts=el.querySelector('.tacts');
+  const claim=document.createElement('button'); claim.className='btn'; claim.textContent=free?'Claim':'▶ Claim';
+  claim.onclick=()=>{ const go=()=>{ grant(kind,id,true); used(); celebrateClaim(el,kind,id,obj); }; free?go():watchAd(go); };
+  acts.appendChild(claim);
+  if(!free){ const no=document.createElement('button'); no.className='btn ghost'; no.textContent='No thanks';
+    no.onclick=()=>{ used(); renderTrack(); }; acts.appendChild(no); }
+}
