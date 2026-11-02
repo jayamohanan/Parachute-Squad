@@ -14,3 +14,6 @@ build/
 
 # Installed by npm install
 node_modules/
+
+# Output of build.sh
+*.zip

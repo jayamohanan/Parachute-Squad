@@ -46,4 +46,4 @@ Plain `<script>` files, no build tool. They share one global scope and load in t
 - Pick the final name.
 
 ## Hosting
-The user deploys to Cloudflare Pages (`index.html`, `style.css` and `js/` at the root; all three must be uploaded) and tests on a phone. Saves live in `localStorage` key `chuteRhythm.v5.progress`.
+`sh build.sh` writes the minified game to `build/` and a zip of it (`--test` runs the quick tests first). Cloudflare Pages runs it on every push (build command `sh build.sh`, output directory `build`); the user tests on a phone. Saves live in `localStorage` key `chuteRhythm.v5.progress`.
