@@ -14,11 +14,14 @@ const adLog=(()=>{
 function adSnap(label){
   const ov=$('adOv'), cs=getComputedStyle(ov), r=ov.getBoundingClientRect(), top=document.elementFromPoint(innerWidth/2,innerHeight/2);
   adLog(`${label}: hidden=${ov.hidden} display=${cs.display} vis=${cs.visibility} op=${cs.opacity} z=${cs.zIndex} box=${r.x|0},${r.y|0} ${r.width|0}x${r.height|0} fill=${$('adFill').getBoundingClientRect().width|0} topEl=${top?(top.id||top.className||top.tagName):'none'}`);
+  const k=ov.querySelector('.card'), ks=getComputedStyle(k), q=e=>{ const b=e.getBoundingClientRect(); return `${b.x|0},${b.y|0} ${b.width.toFixed(1)}x${b.height.toFixed(1)}`; };
+  adLog(`  card=${q(k)} offset=${k.offsetWidth}x${k.offsetHeight} parentH=${ov.clientHeight} transform=${ks.transform} inline=[${k.style.cssText}] display=${ks.display} op=${ks.opacity} pe=${ks.pointerEvents}`);
+  adLog(`  adbox=${q(k.querySelector('.adbox'))} bar=${q(k.querySelector('.adbar'))} fill=${q($('adFill'))} fillW=${getComputedStyle($('adFill')).width}`);
 }
 {
   const realWatchAd=watchAd;
   watchAd=function(onDone,onCancel){
-    adLog(`watchAd called, screen ${innerWidth}x${innerHeight}`);
+    adLog(`watchAd called, screen ${innerWidth}x${innerHeight} ${(navigator.userAgent.match(/OS [\d_]+|Version\/[\d.]+/g)||[]).join(' ')}`);
     realWatchAd(()=>{ adSnap('ad finished'); if(onDone) onDone(); },onCancel);
     adSnap('at once');
     requestAnimationFrame(()=>requestAnimationFrame(()=>adSnap('next frame')));
