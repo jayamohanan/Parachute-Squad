@@ -115,10 +115,11 @@ function showLevelEnd(){
     doneAt=Math.max(doneAt,t0+t1+1600);
   }
   // buttons; the last level of a world always shows the way to the next world
-  const toWorld=worldEnd&&passed, hasNext=toWorld||(passed&&n<LEVELS.length-1&&unlocked(n+1));
-  const nb=$('nextBtn'); nb.hidden=!hasNext; nb.classList.remove('popbtn'); nb.classList.toggle('wend',toWorld);
+  const won=passed||prevSt>0;   // failed a replay of a level already won: Next is offered, Retry stays the main button
+  const toWorld=worldEnd&&won, hasNext=toWorld||(won&&n<LEVELS.length-1&&unlocked(n+1));
+  const nb=$('nextBtn'); nb.hidden=!hasNext; nb.classList.remove('popbtn'); nb.classList.toggle('wend',toWorld); nb.classList.toggle('ghost',!passed);
   nb.innerHTML='<i class="ico lg i-next" role="img" aria-label="Next level"></i>';
-  $('againBtn').className=hasNext?'btn ghost':'btn';
+  $('againBtn').className=hasNext&&passed?'btn ghost':'btn';
   if(toWorld){
     // before the unlock animation the button shows the stars from BEFORE this run
     renderWorldBtn(nw,wasOpen,opensNow?totalStars()-Math.max(0,st-prevSt):null);

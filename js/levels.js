@@ -9,6 +9,7 @@ const LATE_OK=0.62;                     // opened at >= 62% of the braking heigh
 // Slow divers (in steam) need less height to brake, so their band sits lower: braking height scales with speed.
 const VPRE=0.11;                        // drift speed under a faulty chute
 const POP_MIN=0.3, FREEFALL_MIN=0.75;   // faulty chute pops >= 0.3 s after jump, leaving >= 0.75 s of free fall before the band
+const VIEW_BEATS=3.7;                   // a faulty diver's band opens within this many beats of the jump: at phone width the left edge is 4.7 beats behind the plane
 const VVENT=0.22, STEAM_H=0.32;         // updraft: speed inside steam, steam column height
 const PL_LIFT=0.05, PL_AMP=0.04, PL_W=2*Math.PI/2.6; // moving platform
 const DIVE_D=0.14;                      // plane dive depth
@@ -21,7 +22,10 @@ const TEMPO={slow:1.1,med:0.85,fast:0.65};
 const BANDSCALE={normal:1,thin:0.75,razor:0.55};   // perfect window ≈ 120 / 90 / 65 ms
 
 const SUITS=['#ff5a36','#3a7bf0','#9b5cf6','#e8417a','#16a3a3','#f08a24','#4c6ef5','#d6336c','#12b886','#7048e8','#e8590c','#1c7ed6'];
-const rnd=(a,b)=>a+Math.random()*(b-a);
+// Chance inside a level comes from a seed, so a level plays the same every time and a playtest holds for everyone. The sandbox stays random.
+let rng=Math.random;
+function seedRng(s){ rng=()=>{ s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296 } }
+const rnd=(a,b)=>a+rng()*(b-a);
 const pickSome=(arr,n)=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)};
 const bgClouds=Array.from({length:9},()=>({x:Math.random(),y:0.16+Math.random()*0.42,s:0.7+Math.random()*0.8}));
 
@@ -47,7 +51,7 @@ const LEVELS=[
 ];
 // ---------- Worlds 2-5 ----------
 // Entries: a number = plain landing height; V(h) steam vent on a roof, P(h) moving lift, F(h) faulty chute.
-// Level options: band 'normal'|'thin'|'razor', clouds 'off'|'patchy'|'full'.
+// Level options: band 'normal'|'thin'|'razor', clouds 'off'|'patchy'|'full', seed (lift positions, chute pops, clouds; default = level number; change it to get a different arrangement).
 const Hi=0.24;
 const V=h=>({h:Math.max(h,Lo),vent:true}), P=h=>({h,plat:true}), F=h=>({h,faulty:true});
 const L3=(name,tempo,d,o={})=>Object.assign({name,tempo,dummies:0,hearts:3,d},o);

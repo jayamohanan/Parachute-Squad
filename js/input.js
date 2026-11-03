@@ -5,6 +5,7 @@ addEventListener('pointerdown',e=>{ if(e.pointerType==='touch'||e.pointerType===
 addEventListener('keydown',()=>{ inputMode='key'; },{capture:true,passive:true});
 function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
 function tap(){
+  if(paused){ resumeRun(); return; }      // this tap only brings the game back
   if(!running||(S&&S.failed)) return;   // caught / out of hearts: input is locked
   const d=current(); if(!d) return;
   // Level 1 tutorial: ignore blind taps until the world has frozen with the finger showing for ~0.35 s.
@@ -54,7 +55,7 @@ addEventListener('keydown',e=>{
     else if(!$('howOv').hidden){e.preventDefault();$('howBtn').click()}
     else if(!$('wPop').hidden){e.preventDefault();$('wPop').hidden=true}
     else if(!$('endOv').hidden&&performance.now()-endShownAt>500){e.preventDefault();
-      if(settings.mode==='levels'&&!$('nextBtn').hidden) $('nextBtn').click(); else start()}
+      if(settings.mode==='levels'&&!$('nextBtn').hidden&&!$('nextBtn').classList.contains('ghost')) $('nextBtn').click(); else start()}
   }
 });
 

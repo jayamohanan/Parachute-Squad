@@ -231,7 +231,7 @@ function draw(){
 
   // HUD
   if(S){
-    if(S.level!=null){
+    if(S.level!=null&&S.level>=0){
       ctx.textAlign='center';ctx.font=`${Math.round(22*k)}px "Lilita One", system-ui, sans-serif`;
       ctx.lineWidth=4;ctx.strokeStyle='rgba(19,34,56,.6)';
       const lvl=`Level ${levelLabel(S.level)}`;ctx.strokeText(lvl,W/2,28*k);ctx.fillStyle='#fff';ctx.fillText(lvl,W/2,28*k);

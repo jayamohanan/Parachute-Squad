@@ -34,7 +34,7 @@ function collapseStep(dt){
       burst(pl.wx,g-0.03,22,'#9a7a52',0.6,true,0.9);
       burst(pl.wx,g-0.04,10,'#e9eef6',0.9,true,1.1); burst(pl.wx,g-0.04,8,'#ff5a36',0.85,true,1.1); burst(pl.wx,g-0.04,6,'#132238',0.8,true,1.1);
       if(!reduceMotion) S.shake=1.3; SFX.boom(); SFX.crash(); SFX.wahwah(0.5);
-      S.banner={text:'CAUGHT!',t:0,dur:2.2,col:'#ff6b5e'}; }
+      S.banner={text:'CAUGHT BY RADAR!',t:0,dur:2.2,col:'#ff6b5e'}; }
   }
   if(c.boom) c.boom.t+=dt;
   if(pl&&!pl.gone){ c.smokeAcc+=dt; const gap=0.03;

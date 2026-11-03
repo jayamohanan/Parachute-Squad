@@ -155,7 +155,7 @@ console.log('Result screen and rules:');
   await page.click('#wpClose');
   ok(!(await vis(page, 'wPop')) && await vis(page, 'endOv'), 'Close returns to the result screen');
   await page.click('#nextBtn'); await page.click('#wpLevels');
-  ok(await vis(page, 'levelsOv') && !(await vis(page, 'wPop')) && (await text(page, 'wName')).includes('World 1'), 'popup Levels goes to the levels of this world');
+  ok(await vis(page, 'levelsOv') && !(await vis(page, 'wPop')) && (await text(page, 'wName')).startsWith('1 ·'), 'popup Levels goes to the levels of this world');
   await page.close();
 }
 // ---------- 7b. worlds open on the running star total ----------
@@ -253,6 +253,26 @@ console.log('Result screen and rules:');
     ok(await page.evaluate(() => { const b = document.getElementById('howBtn'), r = b.getBoundingClientRect(); return document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2) === b; }), `${width}x${height}: how-to Start can be pressed`);
     await page.close();
   }
+}
+
+// ---------- 13. seeded levels, on-screen chute pops, Next on a failed replay, pause ----------
+{
+  const { page, errors } = await open({ stars: [3, 3, 1] });
+  const snap = n => page.evaluate(n => { __chute.playLevel(n); return JSON.stringify(__chute.state().divers.map(d => [d.wx, d.popDelay, d.plat && d.plat.ph])); }, n);
+  for (const n of [25, 48]) ok(await snap(n) === await snap(n), `Level ${n + 1} plays the same every time`);
+  ok(await page.evaluate(() => [47, 48, 49].every(n => { __chute.playLevel(n); const S = __chute.state();
+    return S.divers.filter(d => d.faulty).every(d => d.enter - d.wx * S.T <= VIEW_BEATS * S.T + 0.2); })), 'faulty divers reach their band while on screen');
+  await page.evaluate(() => { __chute.playLevel(2); window.dispatchEvent(new Event('blur')); });
+  const t0 = await page.evaluate(() => __chute.state().t);
+  await page.clock.runFor(1000);
+  ok(await vis(page, 'pauseOv') && await page.evaluate(() => __chute.state().t) === t0, 'leaving the page holds the game');
+  ok(await vis(page, 'playRetry'), 'retry button shown in play');
+  await page.evaluate(() => __chute.tap());
+  ok(!(await vis(page, 'pauseOv')) && await page.evaluate(() => __chute.state().divers.every(d => !d.opened)), 'the tap back only resumes');
+  await playUntilEnd(page, 2, '[]', 'none'); await page.clock.runFor(900);
+  ok(await vis(page, 'nextBtn') && await page.evaluate(() => !document.getElementById('againBtn').classList.contains('ghost')), 'failed replay of a won level: Next shown, Retry stays main');
+  ok(errors.length === 0, 'no page errors', errors.join(' | '));
+  await page.close();
 }
 
 await browser.close();

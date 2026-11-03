@@ -17,12 +17,13 @@ Current version: **v6.7** (2026-11-02). Game code: `index.html`, `style.css`, `j
 ## Core rules (don't break these)
 - **Eyes on the green band.** Nothing on screen may pull the eye off the band during play.
 - **Every level must allow all-perfect** (band windows ≥ 0.15 s apart). Tempo Slow 1.1 / Med 0.85 / Fast 0.65 s; band ~120 / ~90 / ~65 ms.
+- **A level plays the same every time.** Lift positions, chute pops and clouds come from the level's seed (`seed` option, default = level number), so a playtest holds for every player.
 - **Every non-perfect landing costs one life**; 3 lives per level; lives left = stars. After the last life is lost, nothing else counts.
 - **Progress is saved the moment the result opens or a button is pressed — never at the end of an animation.** Skipping an animation must never lose anything.
 - **Leaving the result screen ends everything from it** (delayed effects via `rt()`, cancelled by `leaveResult()`; sounds cut by `SFX.cutAll()`).
 - **Icons have one meaning each:** ★ = level rating only; 💔 = a life lost; tick = perfect landing; ▶ = go on; circle arrow = retry; grid = levels; TV = watch a rewarded ad.
 - **New features get an intro card** in the how-to style, shown once before their first level. Cards only teach what the player has met.
-- **Minimal words, icons over text.** Only PERFECT gets a word; misses are a breaking heart; "CRASH!", "SPLAT", "CAUGHT!", "NO MORE LIVES".
+- **Minimal words, icons over text.** Only PERFECT gets a word; misses are a breaking heart; "CRASH!", "SPLAT", "CAUGHT BY RADAR!", "NO MORE LIVES".
 - **Cartoony, Poki-safe.** No gore.
 - **Economy:** coins come from play; ads only speed things up; everything is buyable without ads; stars are never sold. Rewarded ads are optional and pay only when the ad finishes.
 - **Sound:** never rely on sound for gameplay (many play muted). Keep result sounds few and not shrill.

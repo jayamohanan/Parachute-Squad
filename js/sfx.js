@@ -1,7 +1,7 @@
 // ---------- sound (synthesized with Web Audio, no files) ----------
 const SFX=(()=>{
   let ac=null, master=null, noiseBuf=null, on=settings.sound!=='off', drone=null;
-  let pend=[], askT=0, played=0, live=[];   // live: one-shot sound nodes still playing (not the drone)
+  let pend=[], askT=0, played=0, live=[], stale=false;   // live: one-shot sound nodes still playing (not the drone)
   const track=n=>{ live.push(n); n.onended=()=>{ const i=live.indexOf(n); if(i>=0) live.splice(i,1); }; };   // sounds asked for while the audio is still waking up, and when we first asked
   function build(){
     const C=window.AudioContext||window.webkitAudioContext; if(!C) return null;
@@ -41,9 +41,12 @@ const SFX=(()=>{
   const PENTA=[0,2,4,7,9,12,14,16,19,21,24];
   return {
     // Called on every tap/key (a user gesture, which iOS needs to restart audio). If an earlier resume never
-    // worked (or the context was closed), rebuild the audio from scratch inside this gesture.
+    // worked (or the context was closed), rebuild the audio from scratch inside this gesture. iOS can also leave the
+    // audio silent after a phone lock or app switch while it claims to be running (only a reload brought it back),
+    // so the first gesture after coming back always rebuilds.
+    stale(){ stale=true; },
     unlock(gesture=true){ if(!on) return;
-      if(gesture&&ac&&ac.state!=='running'&&askT&&performance.now()-askT>400){ try{ac.close()}catch(e){} ac=null; askT=0; ensure(); if(running) this.droneStart(); return; }
+      if(gesture&&ac&&(stale||(ac.state!=='running'&&askT&&performance.now()-askT>400))){ stale=false; try{ac.close()}catch(e){} ac=null; askT=0; live=[]; ensure(); if(wantDrone()) this.droneStart(); return; }
       ensure(); },
     cutAll(){ pend=[]; const t=ac?ac.currentTime:0; for(const n of live){ try{ n.onended=null; n.stop(t); }catch(e){} } live=[]; },
     debug:{live:()=>live.length,state:()=>ac&&ac.state, suspend:()=>ac&&ac.suspend(), played:()=>played, pending:()=>pend.length},

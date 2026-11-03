@@ -3,9 +3,23 @@
 Bundle these into the next build and tell the user each one is included. After a build, move items to "Shipped" with what changed and how it was verified.
 
 ## Pending
-(none)
+1. **Swap World 2 and World 3,** so Base elevators comes before City rooftops: the user found elevators easier and steam harder. Not started; needs a decision first. Steam lift and Base elevators (the levels) use steam, Fast tempo and tall roofs are first taught in the rooftops world, and intro card levels and saved stars move.
+2. **Later, not next build:** teach the double tap (intro card, an easy level with one pair) and ease Level 19 (Smog) to one or two pairs.
+3. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
+- **After v6.7 (2026-11-03), version number unchanged. No item below has been run; `npm test` not run, new checks in `tests/run.mjs` section 13 are unproven; user to playtest:**
+  1. Retry button (circle arrow) top-left during levels; not in training or the sandbox.
+  2. iPhone audio: after a phone lock, app switch or lost focus, the first gesture always rebuilds the audio, since a reload was what brought it back. Needs checking on a real iPhone.
+  3. Fail screen: Next (or the World N button on a world's last level) appears if the level was won before. Retry stays the main button and Space stays on Retry.
+  4. Store: heading, tabs, Back and Watch ad stay fixed; only the items scroll.
+  5. Level grid: game title removed; arrows, world number and name are the header; the ? button moved beside Store, since it would have sat on the right arrow. The next-world row shows "2 · City rooftops". The result screen's World N button keeps the word, because no name follows it there.
+  6. Training no longer shows "Level 0".
+  7. Radar banner now says CAUGHT BY RADAR!.
+  8. Level 49: at phone width and Fast tempo a diver leaves the screen about 3.1 s after the jump, and a late chute pop could put their band after that. Pops are now limited so the band opens within 3.7 beats of the jump (`VIEW_BEATS`), one beat before the edge. This applies to all faulty chutes, so very late pops are also trimmed at Med; tempo and camera unchanged.
+  9. Levels are seeded: lift positions, chute pops and clouds come from the level number, or a `seed` option to swap a bad arrangement. The sandbox stays random. Seeds are new, so earlier playtests of lift and faulty levels don't carry over.
+  10. No pause button. Leaving the page mid-level holds the game with "Tap to continue" ("Press Space" on keyboard); that tap only resumes.
+
 - **After v6.7 (2026-11-02), version number unchanged:** result screen: Next level, Retry and Levels are now icon-only (triangle, circle arrow, 3×3 grid), and the main action is the wider button. (Fixed right after: the icons were missing on the fail screen, because their `big` class clashed with `.result.lost .big`; renamed to `lg`.) The World N button keeps its text, lock and star count. Every rewarded-ad button now starts with a TV icon instead of ▶. Not run; user to playtest.
 - **After v6.7 (2026-11-02), version number unchanged:** level grid: every open level now shows three stars, with unearned ones grey (were earned stars only, centred), so anything short of 3★ is easy to spot. Locked levels show none. `tests/run.mjs` section 9 updated. Not run; user to playtest.
 - **After v6.7 (2026-11-02), version number unchanged:** result screen: "or press Space" hint removed (Space still works); panel is now centred vertically and still scrolls when taller than the screen. Not run; user to playtest.

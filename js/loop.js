@@ -11,12 +11,20 @@ function tutScale(dtReal){
   }
   tu.k=1; return 1;
 }
+// Leaving the page mid-jump: the world holds still until the player taps, so coming back never costs a life.
+let paused=false;
+const wantDrone=()=>running&&!paused&&S&&!S.failed&&S.endAt===null;
+function pauseRun(){ if(!wantDrone()) return; paused=true; SFX.droneStop();
+  $('pauseHint').textContent=inputMode==='touch'?'Tap to continue':'Press Space'; $('pauseOv').hidden=false; }
+function resumeRun(){ clearPause(); SFX.droneStart(); }
+function clearPause(){ paused=false; $('pauseOv').hidden=true; }
 let runId=0;   // each jump gets its own id so a restart never leaves an old loop running
 function loop(ts,id){
   if(id!==runId) return;
   const dt=Math.min(0.05,(ts-lastTS)/1000||0);lastTS=ts;
-  if(running&&S) update(dt*tutScale(dt));
+  if(running&&S&&!paused) update(dt*tutScale(dt));
   draw();
+  $('playRetry').hidden=!(running&&S&&S.level!=null&&S.level>=0);
   if(running) requestAnimationFrame(t=>loop(t,id));
 }
 function start(skipIntro){
@@ -26,6 +34,7 @@ function start(skipIntro){
     const f=INTROS.find(x=>x.level===curLevel);
     if(f&&!(prog.seen||[]).includes(f.key)){ stopRun(); showHow('intro',f); return; }
   }
+  clearPause();
   if(settings.mode==='levels') newLevelRound(training?-1:curLevel); else newRound();
   $('startOv').hidden=true;$('endOv').hidden=true;$('levelsOv').hidden=true;
   SFX.unlock(); SFX.droneStart();
@@ -38,12 +47,13 @@ function restart(){
 }
 $('restartBtn').addEventListener('click',e=>{setDev(false);restart();e.currentTarget.blur()});
 addEventListener('keydown',e=>{ if(e.code==='KeyR'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&$('adOv').hidden&&$('shopOv').hidden){e.preventDefault();restart()} });
+$('playRetry').addEventListener('click',e=>{restart();e.currentTarget.blur()});
 $('startBtn').addEventListener('click',start);
 $('againBtn').addEventListener('click',start);
 $('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} else showWorldPop(worldOf(curLevel)+1); });
 $('lvBtn').addEventListener('click',showLevels);
 $('menuBtn').addEventListener('click',e=>{setDev(false);showLevels();e.currentTarget.blur()});
-function stopRun(){ SFX.droneStop(); running=false; runId++; }
+function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; }
 let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });
@@ -57,7 +67,7 @@ function showLevels(keepWorld){
   let nextUp=LEVELS.findIndex((_,n)=>unlocked(n)&&!(prog.stars[n]>0)); if(nextUp<0) nextUp=-1;
   if(keepWorld!==true||viewWorld==null) viewWorld=worldOf(nextUp>=0?nextUp:Math.min(curLevel,LEVELS.length-1));
   const vw=viewWorld;
-  $('wName').textContent=`World ${vw+1} · ${WORLDS[vw].name}`;
+  $('wName').textContent=`${vw+1} · ${WORLDS[vw].name}`;
   $('wPrev').disabled=vw===0; $('wNext').disabled=vw===WORLDS.length-1;
   syncUnlockAll();
   LEVELS.forEach((L,n)=>{ if(worldOf(n)!==vw) return;
@@ -73,7 +83,7 @@ function showLevels(keepWorld){
   const nw=vw+1, ts=totalStars(), need=worldNeed(nw);
   $('w2').classList.remove('nudge','pulse');
   if(nw<WORLDS.length){ const open2=worldOpen(nw), canGate=!open2&&ts>=need-GATE_NEAR;
-    $('w2').innerHTML=`<span class="lock">${open2?'🔓':'🔒'}</span><div style="flex:1;min-width:0"><b>World ${nw+1} · ${WORLDS[nw].name}</b>
+    $('w2').innerHTML=`<span class="lock">${open2?'🔓':'🔒'}</span><div style="flex:1;min-width:0"><b>${nw+1} · ${WORLDS[nw].name}</b>
       ${open2?'':`<span>${ts}/${need}★</span>`}</div>`+
       (canGate?`<button class="gatebtn" id="gateBtn">${AD_ICO} Unlock now</button>`:`<div class="bar2"><i style="width:${Math.min(100,ts/need*100).toFixed(0)}%"></i></div>`);
     if(canGate) $('gateBtn').onclick=()=>watchAd(()=>{ prog.gate[nw]=1; saveProg(); viewWorld=nw; showLevels(true); });
