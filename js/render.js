@@ -18,7 +18,6 @@ function draw(){
   if(!W||!H) return;
   ctx.setTransform(dpr,0,0,dpr,0,0);
   const k=Math.max(0.75,Math.min(1.45,H/720));
-  const dk=shortWide()?Math.max(0.5,H/600):k;   // divers shrink further on a short screen, to still fit the thinner band
   const u=unit(), T=S?S.T:TEMPO[settings.tempo];
   const planeWX=S?(S.camT!=null?S.camT:S.t)/T:0, PX=(shortWide()?0.62:0.8)*W;
   const sx=wx=>(wx-planeWX)*u+PX;
@@ -133,11 +132,11 @@ function draw(){
       const nx=-(y1-y0), ny=x1-x0, nl=Math.hypot(nx,ny)||1, w=18*k;
       ctx.fillStyle=`rgba(255,240,150,${0.5*f})`; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(x1+nx/nl*w,y1+ny/nl*w); ctx.lineTo(x1-nx/nl*w,y1-ny/nl*w); ctx.closePath(); ctx.fill(); }
     for(const d of S.divers){ if(d.state==='wait') continue;
-      if(d.tumble&&d.state!=='landed'){ const x=sx(d.wx), y=d.y*H-10*k; ctx.save(); ctx.translate(x,y); ctx.rotate(d.rot); ctx.translate(-x,-y); drawDiver(d,sx(d.wx),d.y*H,dk,now); ctx.restore(); }
-      else drawDiver(d,sx(d.wx),d.y*H,dk,now); }
+      if(d.tumble&&d.state!=='landed'){ const x=sx(d.wx), y=d.y*H-10*k; ctx.save(); ctx.translate(x,y); ctx.rotate(d.rot); ctx.translate(-x,-y); drawDiver(d,sx(d.wx),d.y*H,k,now); ctx.restore(); }
+      else drawDiver(d,sx(d.wx),d.y*H,k,now); }
     if(S.col) for(const t of S.col.tumblers){ const x=sx(t.wx), y=t.y*H;   // divers spilled from the plane, out of control
-      if(t.state!=='landed'){ ctx.save(); ctx.translate(x,y-10*k); ctx.rotate(t.rot); ctx.translate(-x,-(y-10*k)); drawDiver(t,x,y,dk,now); ctx.restore(); }
-      else drawDiver(t,x,y,dk,now); }
+      if(t.state!=='landed'){ ctx.save(); ctx.translate(x,y-10*k); ctx.rotate(t.rot); ctx.translate(-x,-(y-10*k)); drawDiver(t,x,y,k,now); ctx.restore(); }
+      else drawDiver(t,x,y,k,now); }
     if(S.radar) for(const d of S.divers){ if(!d.spotT||S.t-d.spotT>1.4) continue;
       const x=sx(d.wx)+18*k, y=d.y*H-66*k, sc=Math.min(1,(S.t-d.spotT)/0.12);
       ctx.fillStyle='#ff3b3b'; ctx.beginPath(); ctx.arc(x,y,11*k*sc,0,Math.PI*2); ctx.fill();
