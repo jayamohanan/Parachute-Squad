@@ -143,6 +143,7 @@ body:not(.levels) .lvonly{display:none!important}
 .qbtn:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
 .howcard{max-width:380px;padding:14px 14px 16px}
 .howcard canvas{width:100%;height:auto;display:block;border-radius:12px}
+.galnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:12px;font-weight:800}
 .lvsub{font-size:13px!important;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted-on-navy)!important}
 .lvgrid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .lv{aspect-ratio:1;border-radius:14px;border:0;background:var(--navy-2);color:var(--ink-on-navy);font-family:var(--f-display);font-size:24px;
@@ -334,6 +335,8 @@ body:not(.levels) .lvonly{display:none!important}
   .howcard{max-width:none;width:auto;display:grid;grid-template-columns:auto 170px;grid-template-rows:1fr auto auto 1fr;gap:10px 14px}
   .howcard canvas{grid-column:1;grid-row:1 / span 4;width:auto;height:calc(100svh - 56px)}
   .howcard .btn{grid-column:2}
+  .howcard .galnav{grid-column:2;grid-row:2;margin-top:0}
+  .galnav:not([hidden])~#howBack{grid-row:3}
   #howBtn{grid-row:2}
   #howBack{grid-row:3}
 }

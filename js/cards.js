@@ -11,11 +11,14 @@ const INTROS=[
 ];
 function showHow(mode,intro){
   howMode=mode; howIntro=intro||null;
-  $('howBtn').textContent=mode==='start'?'Start':mode==='intro'?'Play':'Practice'; $('howBack').hidden=mode!=='view';
+  $('howBtn').textContent=mode==='start'?'Start':mode==='intro'?'Play':'Practice'; $('howBack').hidden=mode!=='view'&&mode!=='gallery';
+  $('howBtn').hidden=mode==='gallery'; $('howNav').hidden=mode!=='gallery';
   $('howCv').setAttribute('aria-label',howIntro?howIntro.aria:'Open too early and you lose a heart. Open in the green band for a perfect landing. Open too late and you crash.');
   $('levelsOv').hidden=true; $('endOv').hidden=true; $('startOv').hidden=true; $('howOv').hidden=false; drawHow();
 }
-$('howBtn').addEventListener('click',()=>{ $('howOv').hidden=true;
+$('howBtn').addEventListener('click',()=>{
+  if(howMode==='gallery'){ showGallery(galIdx+1); return; }   // Space lands here while the button is hidden
+  $('howOv').hidden=true;
   if(howMode==='intro'){ prog.seen=(prog.seen||[]).concat(howIntro.key); saveProg(); start(true); return; }
   startTraining(howMode==='start'?'level1':'levels'); });
 $('howBack').addEventListener('click',()=>{ $('howOv').hidden=true; showLevels(); });
@@ -29,6 +32,17 @@ $('resetProg').addEventListener('click',e=>{
   b.blur(); setDev(false); prog={stars:[],best:[],trained:false,seen:[]}; ensureEco(); saveProg(); curLevel=0; training=false; enterMode();
 });
 $('howOpen').addEventListener('click',()=>showHow('view'));
+// Dev: flip through every tutorial card without playing to it. Nothing is marked as seen. Back returns to the level screen.
+let galIdx=0;
+function showGallery(i){
+  const n=INTROS.length+1; galIdx=(i+n)%n;   // the how-to card first, then the intro cards in level order
+  showHow('gallery',galIdx?INTROS[galIdx-1]:null);
+  $('galPos').textContent=`${galIdx+1} / ${n}`;
+}
+$('galPrev').addEventListener('click',()=>showGallery(galIdx-1));
+$('galNext').addEventListener('click',()=>showGallery(galIdx+1));
+$('cardsBtn').addEventListener('click',e=>{ e.currentTarget.blur(); setDev(false); leaveResult(); stopRun();
+  $('shopOv').hidden=true; $('gradOv').hidden=true; showGallery(0); });
 if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>{ if(!$('howOv').hidden) drawHow() });
 function cardKey(g,x,y){   // desktop version of the tap hand: a little SPACE key
   const w=44,h=18,x0=x-w/2,y0=y-h/2-8;

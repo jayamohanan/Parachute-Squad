@@ -35,6 +35,7 @@
     <button class="vbtn lvonly" id="menuBtn">☰ Levels</button>
     <button class="vbtn lvonly" id="unlockAll">Unlock all levels</button>
     <button class="vbtn lvonly" id="addCoins">+1000 coins</button>
+    <button class="vbtn lvonly" id="cardsBtn">Tut cards</button>
     <button class="vbtn lvonly" id="resetProg">Reset progress</button>
     <button class="vbtn sbx" id="vbtn" aria-expanded="false" aria-controls="vpanel">Variations <span class="badge" id="vcount" hidden>0</span></button>
   </div>
@@ -87,6 +88,11 @@
     <div class="ov" id="howOv" hidden>
       <div class="card howcard">
         <canvas id="howCv" width="640" height="800" aria-label="Open too early and you lose a heart. Open in the green band for a perfect landing. Open too late and you crash."></canvas>
+        <div class="galnav" id="howNav" hidden>
+          <button class="btn ghost" id="galPrev" aria-label="Previous card">◀&#xFE0E;</button>
+          <span id="galPos"></span>
+          <button class="btn ghost" id="galNext" aria-label="Next card">▶&#xFE0E;</button>
+        </div>
         <button class="btn" id="howBtn">Start</button>
         <button class="btn ghost" id="howBack" hidden>Back</button>
       </div>

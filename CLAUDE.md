@@ -43,7 +43,7 @@ Plain `<script>` files, no build tool. They share one global scope and load in t
 
 ## Before Poki release
 - Swap the fake ad (`watchAd`) for `PokiSDK.rewardedBreak`; add `gameplayStart/Stop`, mute during ads.
-- Remove the dev ⚙ controls / sandbox (they hold Unlock all levels, +1000 coins and Reset progress).
+- Remove the dev ⚙ controls / sandbox (they hold Unlock all levels, +1000 coins, Tut cards and Reset progress).
 
 ## Hosting
 `sh build.sh` writes the minified game to `build/` and a zip of it (`--test` runs the quick tests first). Cloudflare Pages runs it on every push (build command `sh build.sh`, output directory `build`); the user tests on a phone. Saves live in `localStorage` key `chuteRhythm.v5.progress`.
