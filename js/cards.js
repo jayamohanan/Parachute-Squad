@@ -85,7 +85,6 @@ function cardBuilding(g,x0,x1,top,groundY,col){
 }
 function cardBand(g,x0,x1,top,h){ g.fillStyle='rgba(47,216,138,.6)'; g.fillRect(x0,top,x1-x0,h); g.strokeStyle='#eafff4'; g.lineWidth=2; g.strokeRect(x0+1,top+1,x1-x0-2,h-2); }
 const CARD_SUIT='#ff5a36', cardMk=(state,chuteT=1)=>({i:0,suit:CARD_SUIT,state,chuteT,heavy:false,dummy:false});
-functionfor(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*0.45:r;g.lineTo(cx+Math.cos(a)*rr,cy+Math.sin(a)*rr)}g.closePath();g.fillStyle='#ffe066';g.fill();g.strokeStyle='#132238';g.lineWidth=1.5;g.stroke()}
 function drawSteamCard(g,Wc,Hc){
   const groundY=372, top=300, cx=110; cardScene(g,Wc,Hc,groundY);
   cardText(g,Wc/2,34,'Steam vents!',26,'#ffffff','center'); drawPlane(250,62,0.7);
