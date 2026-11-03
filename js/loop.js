@@ -7,7 +7,7 @@ function tutScale(dtReal){
   if(tu.done){ tu.k=Math.min(1,tu.k+dtReal*3); return tu.k }
   if(d.state==='fall'){
     const h=groundAt(d,S.t)-d.y, hc=d.dmin+d.band*0.5;
-    if(h<hc+0.07){ tu.show=true; tu.k=Math.max(0,(h-hc)/0.07); if(tu.k<0.05&&!tu.frozenAt) tu.frozenAt=performance.now(); return tu.k }
+    if(h<hc+0.07){ tu.show=true; tu.k=Math.max(0,(h-hc)/0.07); if(tu.queued&&h<=d.dmin+d.band){ tu.queued=false; tap(); } return tu.k }
   }
   tu.k=1; return 1;
 }

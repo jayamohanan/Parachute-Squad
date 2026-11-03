@@ -115,7 +115,6 @@ function showLevelEnd(){
     },t0);
     doneAt=Math.max(doneAt,t0+t1+1600);
   }
-  if(earned){ const seq=resultSeq; rt(()=>{ if(seq===resultSeq&&$('adOv').hidden) sendCoins(); },reduceMotion?0:doneAt); }   // an open ad holds them back: it sends them when it ends
   // buttons; the last level of a world always shows the way to the next world
   const won=passed||prevSt>0;   // failed a replay of a level already won: Next is offered, Retry stays the main button
   const toWorld=worldEnd&&won, hasNext=toWorld||(won&&n<LEVELS.length-1&&unlocked(n+1));
@@ -128,6 +127,7 @@ function showLevelEnd(){
     if(opensNow){ const seq=resultSeq; rt(()=>{ if(seq===resultSeq) playWorldUnlock(nw); },reduceMotion?300:doneAt); }
   }
   $('endOv').hidden=false;$('endOv').scrollTop=0;endShownAt=performance.now();
+  if(earned) startDoubleOffer(Math.max(DBL_OFFER_MS,reduceMotion?0:doneAt));
 }
 // the next-world button on the result screen of a world's last level; locked, it shows the stars and opens the popup
 function renderWorldBtn(nw,open,before){
@@ -188,15 +188,19 @@ function renderCoinRow(earned){
   const el=$('rCoins'); coinFx=null; if(!earned){ el.innerHTML=''; return; }
   coinFx={shown:prog.coins-earned,pend:earned};
   el.innerHTML=`<i class="coin" id="rCoinIco"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">${AD_ICO} ×2</button><span class="coinpill" id="rTotalPill"><i class="coin"></i><span id="rCoinTotal">${coinFx.shown}</span></span>`;
-  $('dblBtn').onclick=()=>watchAd(()=>{
+  $('dblBtn').onclick=()=>{ clearTimeout(coinFx.offerT); const ring=$('dblBtn').querySelector('.drainring'); if(ring) ring.remove(); watchAd(()=>{
     prog.coins+=earned; saveProg(); coinFx.pend+=earned;
     const b=$('dblBtn'), n=$('rCoinN'), seq=resultSeq; b.disabled=true; b.textContent='Doubled!';
     popEl(n.parentElement);
     if(reduceMotion){ n.textContent=earned*2; sendCoins(); return; }
     countUp(n,earned,earned*2,650,()=>seq===resultSeq);
     rt(()=>{ popEl(n.parentElement); sendCoins(); },750);
-  },sendCoins);
+  },endDoubleOffer); };
 }
+// ×2 is offered once, for a few seconds: coins only leave for the total when it's over, and running out or closing the ad removes the button.
+const DBL_OFFER_MS=5000;
+function startDoubleOffer(ms){ const b=$('dblBtn'); drainRing(b,ms,parseFloat(getComputedStyle(b).borderTopLeftRadius)); coinFx.offerT=rt(endDoubleOffer,ms); }
+function endDoubleOffer(){ const b=$('dblBtn'); b.disabled=true; b.style.visibility='hidden'; sendCoins(); }   // hidden, not removed, so the row doesn't jump
 function drawSilhouette(cv,kind,id,frac){
   const off=document.createElement('canvas'); off.width=cv.width; off.height=cv.height; itemThumb(off,kind,id);
   const g=cv.getContext('2d'); g.clearRect(0,0,cv.width,cv.height);
