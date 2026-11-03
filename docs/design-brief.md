@@ -1,6 +1,6 @@
-# Chute Rhythm — design brief and prototype log
+# Parachute Squad — design brief and prototype log
 
-**Name:** "Chute Rhythm" is still only a working title — no final name chosen (see Name ideas).
+**Name:** "Parachute Squad" (chosen 2026-11-03; was the working title "Chute Rhythm").
 
 Current build: **v6.7** (`index.html`, `style.css`, `js/`). Training jump + graduation card, **5 worlds × 10 levels**, 3 lives → stars, how-to-play card, intro cards for radar/steam/lifts/clouds/broken chutes, radar from Level 1-5 (caught = "house of cards" collapse), coins + store + cosmetics + reward track (see `docs/economy.md`), dev controls as a collapsible overlay, sandbox.
 Pending items for the next build live in `docs/next-build.md`.

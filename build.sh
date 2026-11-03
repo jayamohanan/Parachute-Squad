@@ -1,7 +1,7 @@
 #!/bin/sh
 # Production build. Usage: sh build.sh [--test]
 #   --test  run the quick test suite first; a failure stops the build
-# Output: build/ (upload this folder) and chute-rhythm-<version>.zip (same contents).
+# Output: build/ (upload this folder) and parachute-squad-<version>.zip (same contents).
 set -eu
 cd "$(dirname "$0")"
 
@@ -9,7 +9,7 @@ OUT=build
 ASSETS=$OUT/assets
 ESBUILD=node_modules/.bin/esbuild
 VERSION=$(sed -n 's/.*"version": *"\([^"]*\)".*/\1/p' package.json | head -n 1)
-ZIP=chute-rhythm-$VERSION.zip
+ZIP=parachute-squad-$VERSION.zip
 
 hash8() { { sha256sum "$1" 2>/dev/null || shasum -a 256 "$1"; } | cut -c1-8; }
 gzsize() { gzip -9c "$1" | wc -c | tr -d ' '; }
@@ -70,7 +70,7 @@ HEADERS
 if command -v zip >/dev/null; then (cd "$OUT" && zip -qr "../$ZIP" .); fi
 
 # 10. Report
-echo "Chute Rhythm $VERSION built"
+echo "Parachute Squad $VERSION built"
 for f in "$OUT/index.html" "$ASSETS/$JS_NAME" "$ASSETS/$CSS_NAME"; do
   printf '  %-34s %7s bytes  %7s gzipped\n' "$f" "$(wc -c < "$f" | tr -d ' ')" "$(gzsize "$f")"
 done

@@ -1,11 +1,12 @@
-# Chute Rhythm — pending items for the next build
+# Parachute Squad — pending items for the next build
 
 Bundle these into the next build and tell the user each one is included. After a build, move items to "Shipped" with what changed and how it was verified.
 
 ## Pending
 1. **Swap World 2 and World 3,** so Base elevators comes before City rooftops: the user found elevators easier and steam harder. Left for now (user's choice). Steam lift and Base elevators (the levels) use steam, Fast tempo and tall roofs are first taught in the rooftops world, and intro card levels and saved stars move.
 2. **Later:** teach the double tap (intro card, an easy level with one pair) and ease Level 19 (Smog) to one or two pairs.
-3. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
+3. **Ad helpers: hidden, no work until Poki replies.** Code stays, switched off with `HELPERS_ON=false`; skin ads stay. If they come back, the user's preferred design replaces the timed icons: one help icon below the retry button until the game starts, opening a centre popup that lists the helpers, introduced by a card at Level 6 that shrinks into the icon, with Night introduced around the first steam level.
+4. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
 - **After v6.7 (2026-11-03), version number unchanged. Not run: no game play, `npm test` not run, new checks in `tests/run.mjs` section 14 are unproven; user to playtest:**

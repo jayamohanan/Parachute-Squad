@@ -20,6 +20,7 @@ const MIN_GAP=0.15;                     // all-perfect check: next band window m
 const SIM_DT=1/240;
 const TEMPO={slow:1.1,med:0.85,fast:0.65};
 const BANDSCALE={normal:1,thin:0.75,razor:0.55,wide:2};   // perfect window ≈ 120 / 90 / 65 ms; wide: dev only, to try the helper
+const HELPERS_ON=false;                 // ad helpers are hidden for now (user's choice); true brings the retry offer back
 const HELP_WIDE=2, HELP_OFFER=2.5;      // Wide green helper: band ×2 (grows upward only); seconds the retry offer stays up
 
 const SUITS=['#ff5a36','#3a7bf0','#9b5cf6','#e8417a','#16a3a3','#f08a24','#4c6ef5','#d6336c','#12b886','#7048e8','#e8590c','#1c7ed6'];

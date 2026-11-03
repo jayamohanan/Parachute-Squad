@@ -1,6 +1,6 @@
-# Chute Rhythm — instructions for Claude
+# Parachute Squad — instructions for Claude
 
-A rhythm-timing web game for Poki. A plane drops skydivers at a steady beat; the player taps to open each diver's chute as late as possible, inside the green band. Working title "Chute Rhythm" (name not final).
+A rhythm-timing web game for Poki. A plane drops skydivers at a steady beat; the player taps to open each diver's chute as late as possible, inside the green band. Saves keep the old `chuteRhythm` key name so progress isn't lost.
 
 Read these before changing anything:
 - `docs/design-brief.md` — the idea, rules, levels, decisions and their reasons
@@ -25,7 +25,7 @@ Current version: **v6.7** (2026-11-02). Game code: `index.html`, `style.css`, `j
 - **New features get an intro card** in the how-to style, shown once before their first level. Cards only teach what the player has met.
 - **Minimal words, icons over text.** Only PERFECT gets a word; misses are a breaking heart; "CRASH!", "SPLAT", "CAUGHT BY RADAR!", "NO MORE LIVES".
 - **Cartoony, Poki-safe.** No gore.
-- **Economy:** coins come from play; every store item is buyable without ads; stars are never sold, only earned by landing. Helpers are ad-only and only make landing easier, so every level must stay passable without one. Rewarded ads are optional and pay only when the ad finishes.
+- **Economy:** coins come from play; every store item is buyable without ads; stars are never sold, only earned by landing. Helpers (hidden for now, `HELPERS_ON` in `js/levels.js`) are ad-only and only make landing easier, so every level must stay passable without one. Rewarded ads are optional and pay only when the ad finishes.
 - **Sound:** never rely on sound for gameplay (many play muted). Keep result sounds few and not shrill.
 - **Phone first:** works at phone width, touch and keyboard (Space / Up / W).
 
@@ -44,7 +44,6 @@ Plain `<script>` files, no build tool. They share one global scope and load in t
 ## Before Poki release
 - Swap the fake ad (`watchAd`) for `PokiSDK.rewardedBreak`; add `gameplayStart/Stop`, mute during ads.
 - Remove the dev ⚙ controls / sandbox (they hold Unlock all levels, +1000 coins and Reset progress).
-- Pick the final name.
 
 ## Hosting
 `sh build.sh` writes the minified game to `build/` and a zip of it (`--test` runs the quick tests first). Cloudflare Pages runs it on every push (build command `sh build.sh`, output directory `build`); the user tests on a phone. Saves live in `localStorage` key `chuteRhythm.v5.progress`.

@@ -1,4 +1,4 @@
-// Chute Rhythm automated checks.
+// Parachute Squad automated checks.
 // Run:  npm test          (all checks, ~1-3 min)
 //       npm test -- quick (skips the 50-level perfect run)
 // Uses Playwright with a fake clock, so the game runs much faster than real time.
@@ -286,11 +286,13 @@ console.log('Result screen and rules:');
   await playUntilEnd(page, 2, '[]', 'none'); await page.clock.runFor(900);
   await page.click('#againBtn');
   ok(!(await vis(page, 'helpOv')), 'no offer after one fail');
+  if (await page.evaluate(() => HELPERS_ON)) {
   await playUntilEnd(page, 2, '[]', 'none'); await page.clock.runFor(900);
   await page.click('#againBtn');
   ok(await vis(page, 'helpOv') && await page.evaluate(() => __chute.state().divers.every(d => d.state === 'wait')), 'offer after two fails, nobody has jumped');
   await page.evaluate(() => __chute.tap());
   ok(!(await vis(page, 'helpOv')) && await page.evaluate(() => { const S = __chute.state(); return S.t >= S.t0; }), 'a tap starts the level at once');
+  }
   ok(errors.length === 0, 'no page errors', errors.join(' | '));
   await page.close();
 }

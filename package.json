@@ -1,7 +1,7 @@
 {
-  "name": "chute-rhythm",
+  "name": "parachute-squad",
   "version": "6.7.0",
-  "description": "Chute Rhythm web game (Poki)",
+  "description": "Parachute Squad web game (Poki)",
   "directories": {
     "doc": "docs",
     "test": "tests"

@@ -23,7 +23,7 @@ function clearPause(){ paused=false; $('pauseOv').hidden=true; $('helpOv').class
 let helper=null, offerNext=false;
 const lvFails=[], offerRest=[];   // fails in a row per level; retries left before a closed offer may return
 function helpOfferDue(){
-  const n=curLevel; if(settings.mode!=='levels'||training||!S||S.level!==n||LEVELS[n].tut||(prog.stars[n]||0)>=3) return false;
+  const n=curLevel; if(!HELPERS_ON||settings.mode!=='levels'||training||!S||S.level!==n||LEVELS[n].tut||(prog.stars[n]||0)>=3) return false;
   if(S.failed&&(lvFails[n]||0)<2) return false;
   if(offerRest[n]>0){ offerRest[n]--; return false; }
   return true;

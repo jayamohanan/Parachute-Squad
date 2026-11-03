@@ -1,4 +1,4 @@
-# Chute Rhythm — economy, store & cosmetics (v6.1, 2026-11-01; reward track and world gate updated v6.7, 2026-11-02)
+# Parachute Squad — economy, store & cosmetics (v6.1, 2026-11-01; reward track and world gate updated v6.7, 2026-11-02)
 
 Companion to `docs/design-brief.md`.
 
@@ -9,7 +9,7 @@ Companion to `docs/design-brief.md`.
 - **Stars stay earned-only.** World gate ad unlocks the next world instead of adding stars (user picked this over "+3 stars").
 - Rewarded ads follow Poki's rules: optional, clearly announced, reward only when the ad finishes. Prototype uses a fake 2 s ad overlay ("Close (no reward)" cancels) standing in for `PokiSDK.rewardedBreak`.
 
-## Ad helpers (agreed with user 2026-11-03)
+## Ad helpers (agreed with user 2026-11-03; hidden since then, `HELPERS_ON=false`)
 Ad-only, one ad per helper, for the next try only. Stars still equal lives left, so all perfect with a helper is 3★; every level must stay passable without one.
 - **Wide green:** the level's band ×2, growing upward only. Every level.
 - **Night:** steam, lifts and clouds off; radar and faulty chutes stay. Only on levels with steam, lifts or clouds.
