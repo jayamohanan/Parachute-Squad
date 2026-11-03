@@ -71,6 +71,7 @@ function update(dt){
   if(S.col){ const c=S.col; c.ct+=dt;
     dt*=c.ct<COL.slowEnd?COL.slow:Math.min(1,COL.slow+(c.ct-COL.slowEnd)/0.25*(1-COL.slow)); }
   S.t+=dt;
+  if(S.offerEnd!=null&&S.t>=S.offerEnd) endOffer();
   for(const d of S.divers){
     if(d.state==='wait'&&S.t>=d.tDrop&&!S.failed){
       d.y=planeYAt(d.wx)+0.025; SFX.drop();

@@ -275,6 +275,26 @@ console.log('Result screen and rules:');
   await page.close();
 }
 
+// ---------- 14. ad helpers ----------
+{
+  const { page, errors } = await open({ stars: [3, 3] });
+  ok(await page.evaluate(() => !nightOk(40) && nightOk(43) && nightOk(13) && nightOk(30) && !nightOk(0)), 'Night only on levels with steam, lifts or clouds');
+  ok(await page.evaluate(() => { helper = 'night'; __chute.playLevel(24); const S = __chute.state(); return S.night && S.radar && S.divers.every(d => !d.plat && !d.vent); }), 'Night: lifts and steam off, radar stays');
+  ok(await page.evaluate(() => { helper = 'night'; __chute.playLevel(48); return __chute.state().divers.some(d => d.faulty); }), 'Night: faulty chutes stay');
+  ok(await page.evaluate(() => { __chute.playLevel(16); const a = __chute.current ? __chute.state().divers[0].dmin : 0, b0 = __chute.state().divers[0].band; helper = 'wide'; __chute.playLevel(16); const d = __chute.state().divers[0]; return Math.abs(d.band - b0 * 2) < 1e-9 && d.dmin === a; }), 'Wide green: band ×2, bottom edge unchanged');
+  ok(await page.evaluate(() => { for (let n = 0; n < LEVELS.length; n++) for (const h of ['wide', 'night']) { if (h === 'night' && !nightOk(n)) continue; helper = h; __chute.playLevel(n); const D = __chute.state().divers; for (let i = 1; i < D.length; i++) if (D[i].enter - D[i - 1].enter < MIN_GAP - 1e-6) return false; } return true; }), 'all-perfect windows hold with every helper');
+  await playUntilEnd(page, 2, '[]', 'none'); await page.clock.runFor(900);
+  await page.click('#againBtn');
+  ok(!(await vis(page, 'helpOv')), 'no offer after one fail');
+  await playUntilEnd(page, 2, '[]', 'none'); await page.clock.runFor(900);
+  await page.click('#againBtn');
+  ok(await vis(page, 'helpOv') && await page.evaluate(() => __chute.state().divers.every(d => d.state === 'wait')), 'offer after two fails, nobody has jumped');
+  await page.evaluate(() => __chute.tap());
+  ok(!(await vis(page, 'helpOv')) && await page.evaluate(() => { const S = __chute.state(); return S.t >= S.t0; }), 'a tap starts the level at once');
+  ok(errors.length === 0, 'no page errors', errors.join(' | '));
+  await page.close();
+}
+
 await browser.close();
 console.log(`\n${passes} passed, ${failures} failed`);
 process.exit(failures ? 1 : 0);

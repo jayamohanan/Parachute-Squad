@@ -21,11 +21,11 @@ Current version: **v6.7** (2026-11-02). Game code: `index.html`, `style.css`, `j
 - **Every non-perfect landing costs one life**; 3 lives per level; lives left = stars. After the last life is lost, nothing else counts.
 - **Progress is saved the moment the result opens or a button is pressed — never at the end of an animation.** Skipping an animation must never lose anything.
 - **Leaving the result screen ends everything from it** (delayed effects via `rt()`, cancelled by `leaveResult()`; sounds cut by `SFX.cutAll()`).
-- **Icons have one meaning each:** ★ = level rating only; 💔 = a life lost; tick = perfect landing; ▶ = go on; circle arrow = retry; grid = levels; TV = watch a rewarded ad.
+- **Icons have one meaning each:** ★ = level rating only; 💔 = a life lost; tick = perfect landing; ▶ = go on; circle arrow = retry; grid = levels; TV = watch a rewarded ad (always with the word AD); moon = Night helper; band with up arrow = Wide green helper.
 - **New features get an intro card** in the how-to style, shown once before their first level. Cards only teach what the player has met.
 - **Minimal words, icons over text.** Only PERFECT gets a word; misses are a breaking heart; "CRASH!", "SPLAT", "CAUGHT BY RADAR!", "NO MORE LIVES".
 - **Cartoony, Poki-safe.** No gore.
-- **Economy:** coins come from play; ads only speed things up; everything is buyable without ads; stars are never sold. Rewarded ads are optional and pay only when the ad finishes.
+- **Economy:** coins come from play; every store item is buyable without ads; stars are never sold, only earned by landing. Helpers are ad-only and only make landing easier, so every level must stay passable without one. Rewarded ads are optional and pay only when the ad finishes.
 - **Sound:** never rely on sound for gameplay (many play muted). Keep result sounds few and not shrill.
 - **Phone first:** works at phone width, touch and keyboard (Space / Up / W).
 

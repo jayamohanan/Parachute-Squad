@@ -9,6 +9,12 @@ Companion to `docs/design-brief.md`.
 - **Stars stay earned-only.** World gate ad unlocks the next world instead of adding stars (user picked this over "+3 stars").
 - Rewarded ads follow Poki's rules: optional, clearly announced, reward only when the ad finishes. Prototype uses a fake 2 s ad overlay ("Close (no reward)" cancels) standing in for `PokiSDK.rewardedBreak`.
 
+## Ad helpers (agreed with user 2026-11-03)
+Ad-only, one ad per helper, for the next try only. Stars still equal lives left, so all perfect with a helper is 3★; every level must stay passable without one.
+- **Wide green:** the level's band ×2, growing upward only. Every level.
+- **Night:** steam, lifts and clouds off; radar and faulty chutes stay. Only on levels with steam, lifts or clouds.
+- **Offer:** on Retry from the result screen, after 2 fails in a row on that level or a pass under 3★, on levels under 3★. Icons below the plane for 2.5 s with nobody jumping, each with a stroke draining anticlockwise. A tap elsewhere starts at once. A closed offer stays away for the next 2 retries on that level. Never on a first play or from the in-play retry button.
+
 ## Earning
 | Source | Coins |
 |---|---|

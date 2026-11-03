@@ -3,11 +3,19 @@
 Bundle these into the next build and tell the user each one is included. After a build, move items to "Shipped" with what changed and how it was verified.
 
 ## Pending
-1. **Swap World 2 and World 3,** so Base elevators comes before City rooftops: the user found elevators easier and steam harder. Not started; needs a decision first. Steam lift and Base elevators (the levels) use steam, Fast tempo and tall roofs are first taught in the rooftops world, and intro card levels and saved stars move.
-2. **Later, not next build:** teach the double tap (intro card, an easy level with one pair) and ease Level 19 (Smog) to one or two pairs.
+1. **Swap World 2 and World 3,** so Base elevators comes before City rooftops: the user found elevators easier and steam harder. Left for now (user's choice). Steam lift and Base elevators (the levels) use steam, Fast tempo and tall roofs are first taught in the rooftops world, and intro card levels and saved stars move.
+2. **Later:** teach the double tap (intro card, an easy level with one pair) and ease Level 19 (Smog) to one or two pairs.
 3. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
+- **After v6.7 (2026-11-03), version number unchanged. Not run: no game play, `npm test` not run, new checks in `tests/run.mjs` section 14 are unproven; user to playtest:**
+  1. Ad helpers: Wide green and Night, offered as timed icons at the start of a retry. Rules in `docs/economy.md`. The ad-only rule and star rule are reworded in `CLAUDE.md`. A retry that shows the offer starts a few empty beats later; lift phase and cloud gaps are offset so the level still matches its seed. Sandbox Band setting gains Wide, to try the size.
+  2. Fake ad card: `z-index` above every other screen, the first fix to try for it not showing on mobile. Needs checking on a phone.
+  3. Every ad button now says AD beside the TV icon (user's request; it wasn't on the pending list).
+  4. Keep old: a stroke drains anticlockwise from top centre, and runs out as the card leaves (4 s). No stroke with reduced motion.
+  5. Cards: plane at top right, divers below and to its left, on steam, lifts, clouds, broken chutes and how-to. Broken chutes and how-to now read top right to bottom left.
+  6. Radar card text: "Don't open your chute in the red zone"; hidden screen-reader text changed too.
+  7. Divers: gunmetal robot with an outlined head; thin dark outline on every skin, light at night.
 - **After v6.7 (2026-11-03), version number unchanged. No item below has been run; `npm test` not run, new checks in `tests/run.mjs` section 13 are unproven; user to playtest:**
   1. Retry button (circle arrow) top-left during levels; not in training or the sandbox.
   2. iPhone audio: after a phone lock, app switch or lost focus, the first gesture always rebuilds the audio, since a reload was what brought it back. Needs checking on a real iPhone.

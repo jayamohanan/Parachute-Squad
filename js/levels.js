@@ -19,7 +19,8 @@ const CLOUD_DIP=0.09;                   // max dip of the cloud base between nei
 const MIN_GAP=0.15;                     // all-perfect check: next band window must open >= this after the previous one
 const SIM_DT=1/240;
 const TEMPO={slow:1.1,med:0.85,fast:0.65};
-const BANDSCALE={normal:1,thin:0.75,razor:0.55};   // perfect window ≈ 120 / 90 / 65 ms
+const BANDSCALE={normal:1,thin:0.75,razor:0.55,wide:2};   // perfect window ≈ 120 / 90 / 65 ms; wide: dev only, to try the helper
+const HELP_WIDE=2, HELP_OFFER=2.5;      // Wide green helper: band ×2 (grows upward only); seconds the retry offer stays up
 
 const SUITS=['#ff5a36','#3a7bf0','#9b5cf6','#e8417a','#16a3a3','#f08a24','#4c6ef5','#d6336c','#12b886','#7048e8','#e8590c','#1c7ed6'];
 // Chance inside a level comes from a seed, so a level plays the same every time and a playtest holds for everyone. The sandbox stays random.
@@ -27,6 +28,7 @@ let rng=Math.random;
 function seedRng(s){ rng=()=>{ s=s+0x6D2B79F5|0; let t=Math.imul(s^s>>>15,1|s); t=t+Math.imul(t^t>>>7,61|t)^t; return ((t^t>>>14)>>>0)/4294967296 } }
 const rnd=(a,b)=>a+rng()*(b-a);
 const pickSome=(arr,n)=>{const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.random()*(i+1)|0;[a[i],a[j]]=[a[j],a[i]]}return a.slice(0,n)};
+const nightDots=Array.from({length:40},()=>({x:Math.random(),y:Math.random()*0.55,r:0.7+Math.random()*0.7}));
 const bgClouds=Array.from({length:9},()=>({x:Math.random(),y:0.16+Math.random()*0.42,s:0.7+Math.random()*0.8}));
 
 // ---------- World 1 levels ----------
@@ -143,6 +145,8 @@ function trackItem(){   // current reward on the track, skipping anything alread
   while(prog.trackDone<TRACK.length&&owns(...TRACK[prog.trackDone])) prog.trackDone++;
   return prog.trackDone<TRACK.length?TRACK[prog.trackDone]:null;
 }
+// Night is only offered where it changes something: faulty chutes don't depend on the time of day.
+const nightOk=n=>{ const L=LEVELS[n]; return (L.clouds&&L.clouds!=='off')||L.d.some(x=>x&&(x.vent||x.plat)); };
 const worldStars=w=>{let a=0;for(let n=w*PER_WORLD;n<(w+1)*PER_WORLD;n++)a+=prog.stars[n]||0;return a};
 const totalStars=()=>LEVELS.reduce((a,_,n)=>a+(prog.stars[n]||0),0);
 const worldNeed=w=>w*W_NEED;

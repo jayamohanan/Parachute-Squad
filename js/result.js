@@ -69,6 +69,7 @@ function showLevelEnd(){
   const wasOpen=worldEnd&&worldOpen(nw);
   if(st>prevSt) prog.stars[n]=st;
   prog.best[n]=Math.max(prog.best[n]||0,perf);
+  lvFails[n]=passed?0:(lvFails[n]||0)+1;
   const earned=passed?Math.max(0,st-prevSt)*20+10+(S.best>=5?10:0):0;   // new stars x20, +10 finished, +10 streak of 5+
   prog.coins+=earned; if(passed&&prevSt===0) prog.wins++;
   saveProg();   // everything (stars, coins, wins, a world opened by these stars) is saved now; animations only show it
@@ -172,11 +173,11 @@ function celebrateClaim(el,kind,id,obj,old){   // item pops out, rays, UNLOCKED!
     <div class="stamp">UNLOCKED!</div>`+
     Array.from({length:16},()=>`<i class="cf" style="background:${cols[Math.random()*cols.length|0]};--x:${(Math.random()*220-60).toFixed(0)}px;--y:${(-Math.random()*90-10).toFixed(0)}px;--r:${(Math.random()*720-360).toFixed(0)}deg"></i>`).join('');
   itemThumb(el.querySelector('canvas'),kind,id);
-  const keep=el.querySelector('.keepold');
+  const keep=el.querySelector('.keepold'), KEEP_MS=4000; drainRing(keep,KEEP_MS,keep.offsetHeight/2);
   keep.onclick=()=>{ prog.sel[kind]=old; saveProg(); keep.remove(); el.querySelector('.eq').textContent='✓ In your Store'; };
   SFX.end(true); rt(()=>SFX.star(2),180);
   rt(()=>{ if(seq!==resultSeq) return; el.classList.add('fadeout');
-    rt(()=>{ if(seq!==resultSeq) return; renderTrack(); },300); },4000);
+    rt(()=>{ if(seq!==resultSeq) return; renderTrack(); },300); },KEEP_MS);
 }
 function renderTrack(){
   const el=$('rTrack'), it=trackItem(); if(!it||prog.rlv>=REWARD_LV.length){ el.hidden=true; return; }

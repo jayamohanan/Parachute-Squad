@@ -7,6 +7,7 @@ function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x
 function tap(){
   if(paused){ resumeRun(); return; }      // this tap only brings the game back
   if(!running||(S&&S.failed)) return;   // caught / out of hearts: input is locked
+  if(S&&S.offerEnd!=null){ endOffer(true); return; }   // this tap only starts the level
   const d=current(); if(!d) return;
   // Level 1 tutorial: ignore blind taps until the world has frozen with the finger showing for ~0.35 s.
   if(S.tut&&!S.tut.done&&d.i===S.tut.idx&&!(S.tut.frozenAt&&performance.now()-S.tut.frozenAt>350)) return;
@@ -55,7 +56,7 @@ addEventListener('keydown',e=>{
     else if(!$('howOv').hidden){e.preventDefault();$('howBtn').click()}
     else if(!$('wPop').hidden){e.preventDefault();$('wPop').hidden=true}
     else if(!$('endOv').hidden&&performance.now()-endShownAt>500){e.preventDefault();
-      if(settings.mode==='levels'&&!$('nextBtn').hidden&&!$('nextBtn').classList.contains('ghost')) $('nextBtn').click(); else start()}
+      if(settings.mode==='levels'&&!$('nextBtn').hidden&&!$('nextBtn').classList.contains('ghost')) $('nextBtn').click(); else $('againBtn').click()}
   }
 });
 

@@ -1,12 +1,12 @@
 // ---------- fake rewarded ad (stands in for PokiSDK.rewardedBreak: reward only when it finishes) ----------
-let adCb=null, adTimer=0;
-function watchAd(onDone){
+let adCb=null, adCancel=null, adTimer=0;
+function watchAd(onDone,onCancel){
   const ov=$('adOv'), fill=$('adFill'); ov.hidden=false;
   fill.style.transition='none'; fill.style.width='0'; void fill.offsetWidth; fill.style.transition='width 2s linear'; fill.style.width='100%';
-  adCb=onDone; clearTimeout(adTimer);
+  adCb=onDone; adCancel=onCancel||null; clearTimeout(adTimer);
   adTimer=setTimeout(()=>{ ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },2000);
 }
-$('adClose').addEventListener('click',()=>{ clearTimeout(adTimer); adCb=null; $('adOv').hidden=true; });
+$('adClose').addEventListener('click',()=>{ clearTimeout(adTimer); adCb=null; $('adOv').hidden=true; const c=adCancel; adCancel=null; if(c) c(); });
 
 // ---------- store ----------
 const LISTS={chute:CHUTES,diver:DIVERS,plane:PLANES};

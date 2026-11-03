@@ -14,10 +14,38 @@ function tutScale(dtReal){
 // Leaving the page mid-jump: the world holds still until the player taps, so coming back never costs a life.
 let paused=false;
 const wantDrone=()=>running&&!paused&&S&&!S.failed&&S.endAt===null;
-function pauseRun(){ if(!wantDrone()) return; paused=true; SFX.droneStop();
+function pauseRun(){ if(!wantDrone()) return; paused=true; SFX.droneStop(); $('helpOv').classList.add('held');
   $('pauseHint').textContent=inputMode==='touch'?'Tap to continue':'Press Space'; $('pauseOv').hidden=false; }
 function resumeRun(){ clearPause(); SFX.droneStart(); }
-function clearPause(){ paused=false; $('pauseOv').hidden=true; }
+function clearPause(){ paused=false; $('pauseOv').hidden=true; $('helpOv').classList.remove('held'); }
+// Ad helpers, offered at the start of a retry and never during play: for HELP_OFFER s the plane flies with nobody jumping.
+// A helper only changes the next try. Stars still equal lives left.
+let helper=null, offerNext=false;
+const lvFails=[], offerRest=[];   // fails in a row per level; retries left before a closed offer may return
+function helpOfferDue(){
+  const n=curLevel; if(settings.mode!=='levels'||training||!S||S.level!==n||LEVELS[n].tut||(prog.stars[n]||0)>=3) return false;
+  if(S.failed&&(lvFails[n]||0)<2) return false;
+  if(offerRest[n]>0){ offerRest[n]--; return false; }
+  return true;
+}
+function showOffer(){
+  const ov=$('helpOv'), first=!(prog.seen||[]).includes('helpers');
+  $('helpNight').hidden=!nightOk(S.level); $('helpHint').textContent=inputMode==='touch'?'Tap to start':'Press Space';
+  ov.classList.toggle('first',first); ov.hidden=false;
+  for(const b of [$('helpWide'),$('helpNight')]) if(!b.hidden) drainRing(b,HELP_OFFER*1000,18);
+  if(first){ prog.seen=(prog.seen||[]).concat('helpers'); saveProg(); }
+}
+function endOffer(jump){   // jump: tapped to start, so skip the rest of the empty beats
+  if(!S||S.offerEnd==null) return;
+  if(jump) S.t=Math.max(S.t,S.t0);
+  S.offerEnd=null; $('helpOv').hidden=true; offerRest[S.level]=2;
+}
+function pickHelper(kind){   // only a finished ad gives the helper; closing it starts the try as normal
+  stopRun(); watchAd(()=>{ helper=kind; start(true); },()=>start(true));
+}
+$('helpWide').addEventListener('click',()=>pickHelper('wide'));
+$('helpNight').addEventListener('click',()=>pickHelper('night'));
+function retryFromResult(){ offerNext=helpOfferDue(); start(true); }
 let runId=0;   // each jump gets its own id so a restart never leaves an old loop running
 function loop(ts,id){
   if(id!==runId) return;
@@ -37,6 +65,7 @@ function start(skipIntro){
   clearPause();
   if(settings.mode==='levels') newLevelRound(training?-1:curLevel); else newRound();
   $('startOv').hidden=true;$('endOv').hidden=true;$('levelsOv').hidden=true;
+  if(S.offerEnd!=null) showOffer();
   SFX.unlock(); SFX.droneStart();
   const id=++runId;
   running=true;lastTS=performance.now();requestAnimationFrame(t=>loop(t,id));
@@ -49,11 +78,11 @@ $('restartBtn').addEventListener('click',e=>{setDev(false);restart();e.currentTa
 addEventListener('keydown',e=>{ if(e.code==='KeyR'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&$('adOv').hidden&&$('shopOv').hidden){e.preventDefault();restart()} });
 $('playRetry').addEventListener('click',e=>{restart();e.currentTarget.blur()});
 $('startBtn').addEventListener('click',start);
-$('againBtn').addEventListener('click',start);
+$('againBtn').addEventListener('click',retryFromResult);
 $('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} else showWorldPop(worldOf(curLevel)+1); });
 $('lvBtn').addEventListener('click',showLevels);
 $('menuBtn').addEventListener('click',e=>{setDev(false);showLevels();e.currentTarget.blur()});
-function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; }
+function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; $('helpOv').hidden=true; }
 let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });
