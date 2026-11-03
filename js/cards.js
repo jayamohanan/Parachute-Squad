@@ -199,20 +199,20 @@ function drawHow(){
   // sky + ground
   const sky=g.createLinearGradient(0,0,0,Hc); sky.addColorStop(0,'#2f6ccf'); sky.addColorStop(0.6,'#7fb4ee'); sky.addColorStop(0.95,'#ffe1b8');
   g.fillStyle=sky; g.fillRect(0,0,Wc,Hc);
-  g.fillStyle='rgba(255,255,255,.75)'; for(const [x,y,s] of [[60,70,1],[250,120,0.8],[150,200,0.9]]){g.beginPath();g.ellipse(x,y,30*s,10*s,0,0,Math.PI*2);g.ellipse(x+12*s,y-8*s,16*s,11*s,0,0,Math.PI*2);g.fill()}
+  g.fillStyle='rgba(255,255,255,.75)'; for(const [x,y,s] of [[150,78,1],[250,120,0.8],[150,200,0.9]]){g.beginPath();g.ellipse(x,y,30*s,10*s,0,0,Math.PI*2);g.ellipse(x+12*s,y-8*s,16*s,11*s,0,0,Math.PI*2);g.fill()}
   // perfect band, full width: see-through so it sits in the sky, no outline (the outline is an in-game helper)
   g.fillStyle='rgba(47,216,138,.38)'; g.fillRect(0,bandTop,Wc,bandH);
   g.fillStyle='#6fae4f'; g.fillRect(0,groundY,Wc,Hc-groundY); g.fillStyle='#5a9440'; g.fillRect(0,groundY,Wc,4);
-  // One diver's story reads top-right → bottom-left, as in the game: jump, then three places you could tap.
-  const F={x:212,y:92}, d1={x:170,y:158}, d2={x:130,y:bandTop+bandH-4}, d3={x:96,y:groundY-6};
-  // plane (top right, where the story starts)
+  // One diver's story reads top-left → bottom-right: dropped from a plane flying right, the diver keeps drifting right. Jump, then three places you could tap.
+  const F={x:54,y:92}, d1={x:96,y:158}, d2={x:136,y:bandTop+bandH-4}, d3={x:170,y:groundY-6};
+  // plane (top right: it has flown on past the diver)
   drawPlane(244,40,0.9);
   const SUIT='#ff5a36', mk=(state,chuteT=1)=>({i:0,suit:SUIT,state,chuteT,heavy:false,dummy:false});
-  { const d=mk('fall'); g.save(); g.translate(F.x,F.y); g.rotate(0.35); g.scale(1.45,1.45);   // just jumped: a clear little person, arms up
+  { const d=mk('fall'); g.save(); g.translate(F.x,F.y); g.rotate(-0.35); g.scale(1.45,1.45);   // just jumped: a clear little person, arms up
     g.lineCap='round'; g.lineJoin='round'; drawBody(d,'up'); drawHead(d,0,-20); g.restore(); }
   g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.75)'; g.lineWidth=2;
-  g.beginPath(); g.moveTo(F.x-8,F.y+8); g.lineTo(F.x-20,F.y+24); g.stroke(); g.setLineDash([]);
-  g.fillStyle='rgba(255,255,255,.85)'; g.beginPath(); g.moveTo(F.x-24,F.y+30); g.lineTo(F.x-15,F.y+25); g.lineTo(F.x-23,F.y+20); g.fill();
+  g.beginPath(); g.moveTo(F.x+8,F.y+8); g.lineTo(F.x+20,F.y+24); g.stroke(); g.setLineDash([]);
+  g.fillStyle='rgba(255,255,255,.85)'; g.beginPath(); g.moveTo(F.x+24,F.y+30); g.lineTo(F.x+15,F.y+25); g.lineTo(F.x+23,F.y+20); g.fill();
   drawDiver(mk('chute'),d1.x,d1.y,1.25,now);                  // 1. tapped too high
   drawDiver(mk('chute'),d2.x,d2.y,1.25,now);                  // 2. tapped in the band
   drawDiver(mk('chute',0.02),d3.x,d3.y,1.25,now);             // 3. tapped too low: chute barely open
@@ -289,13 +289,15 @@ function drawDiver(d,x,y,k,now){
   }
   // free fall: spread-eagle star with flutter
   const fl=Math.sin(now*14+d.i)*1.5;
-  ctx.strokeStyle=bodyCol(d);ctx.lineWidth=d.heavy?4:3;
+  const lw=d.heavy?4:3;
+  if(d.heavy){ctx.fillStyle=outlineCol();ctx.beginPath();ctx.ellipse(0,-10,7.5,8,0,0,Math.PI*2);ctx.fill()}
+  const limbs=new Path2D();
+  limbs.moveTo(0,-6);limbs.lineTo(-6,1+fl);limbs.moveTo(0,-6);limbs.lineTo(6,1-fl);
+  limbs.moveTo(0,-6);limbs.lineTo(0,-14);
+  limbs.moveTo(0,-12);limbs.lineTo(-8,-18-fl);limbs.moveTo(0,-12);limbs.lineTo(8,-18+fl);
+  ctx.strokeStyle=outlineCol();ctx.lineWidth=lw+2;ctx.stroke(limbs);
   if(d.heavy){ctx.fillStyle=bodyCol(d);ctx.beginPath();ctx.ellipse(0,-10,6.5,7,0,0,Math.PI*2);ctx.fill()}
-  ctx.beginPath();
-  ctx.moveTo(0,-6);ctx.lineTo(-6,1+fl);ctx.moveTo(0,-6);ctx.lineTo(6,1-fl);
-  ctx.moveTo(0,-6);ctx.lineTo(0,-14);
-  ctx.moveTo(0,-12);ctx.lineTo(-8,-18-fl);ctx.moveTo(0,-12);ctx.lineTo(8,-18+fl);
-  ctx.stroke();
+  ctx.strokeStyle=bodyCol(d);ctx.lineWidth=lw;ctx.stroke(limbs);
   drawHead(d,0,-18);
   ctx.restore();
 }
