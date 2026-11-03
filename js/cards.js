@@ -344,12 +344,14 @@ function showGrad(perf,hs,gift){
     startB.className='btn ghost'; acts.appendChild(pr); acts.appendChild(startB); SFX.rate('good',0); }
 }
 
-// ---------- fit cards to short screens (the store and result screens scroll instead) ----------
-const fitList=[...document.querySelectorAll('.ov .card:not(.shopcard)')];
+// ---------- fit cards to short screens (the store scrolls instead; the result only scales on a phone on its side, and scrolls on a short upright screen) ----------
+const fitList=[...document.querySelectorAll('.ov .card:not(.shopcard), .ov .result')];
 function fitCards(){
   for(const c of fitList){
     const h=c.offsetHeight; if(!h) continue;   // hidden
-    const s=Math.min(1,(c.parentElement.clientHeight-32)/h);   // 32 = the overlay's padding
+    const isResult=c.classList.contains('result');
+    if(isResult&&!shortWide()){ c.style.transform=''; continue; }
+    const s=Math.min(1,(c.closest('.ov').clientHeight-32)/h);   // 32 = the overlay's padding
     c.style.transform=s<1?`scale(${s})`:'';
   }
 }

@@ -300,3 +300,33 @@ body:not(.levels) .lvonly{display:none!important}
 @media (prefers-reduced-motion: reduce){.tile,.rbadge{animation:none}}
 @media (max-width:560px){.brand{width:100%}.bar{gap:6px 10px}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}
   .strip{grid-template-columns:repeat(calc(var(--n,12) / 2),minmax(0,1fr))}.big strong{font-size:60px}.seg button{padding:5px 9px}}
+
+/* Phone on its side: screens rearrange to use the width instead of scrolling (same test as shortWide() in js/render.js) */
+@media (orientation:landscape) and (max-height:500px){
+  .ov{padding-block:8px}
+  .card{padding:12px 14px}
+  .end{overflow:hidden}
+  .sheet{max-width:760px}
+  .result{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:20px;row-gap:8px;padding:12px 16px;align-items:center;transform-origin:top center}
+  .result>*{grid-column:1;min-width:0}
+  .result .big strong{font-size:44px}
+  .result .big span{font-size:22px}
+  .result #rCoins{grid-column:2;grid-row:1}
+  .result #rTrack{grid-column:2;grid-row:2 / span 2}
+  .result .actions{grid-column:2;grid-row:4}
+  .lvcard{max-width:720px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:8px 14px;align-items:center}
+  .lvcard>*{grid-column:1}
+  .lvcard .lvgrid{grid-column:2;grid-row:1 / span 3}
+  .shopcard{max-width:none;height:100%;display:grid;grid-template-columns:200px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:8px 12px}
+  .shophead{grid-column:1;grid-row:1}
+  .shophead h2{font-size:22px}
+  .tabs{grid-column:1;grid-row:2;flex-direction:column;align-self:start}
+  .tab{flex:none;padding:6px}
+  .shopfoot{grid-column:1;grid-row:3;flex-wrap:nowrap}
+  .shopgrid{grid-column:2;grid-row:1 / span 3;height:100%;grid-template-columns:repeat(auto-fill,minmax(104px,1fr))}
+  .howcard{max-width:none;width:auto;display:grid;grid-template-columns:auto 170px;grid-template-rows:1fr auto auto 1fr;gap:10px 14px}
+  .howcard canvas{grid-column:1;grid-row:1 / span 4;width:auto;height:calc(100svh - 56px)}
+  .howcard .btn{grid-column:2}
+  #howBtn{grid-row:2}
+  #howBack{grid-row:3}
+}
