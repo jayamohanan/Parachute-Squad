@@ -70,9 +70,11 @@ function burst(wx,y,n,color,spd,up,life=0.6){
 function update(dt){
   if(S.col){ const c=S.col; c.ct+=dt;
     dt*=c.ct<COL.slowEnd?COL.slow:Math.min(1,COL.slow+(c.ct-COL.slowEnd)/0.25*(1-COL.slow)); }
-  S.t+=dt;
+  if(S.frozenAt){ S.endAt-=dt; S.heartLostT-=dt; }   // last life gone: the world stops at once, only effects and the wait for the result run on
+  else S.t+=dt;
   if(S.offerEnd!=null&&S.t>=S.offerEnd) endOffer();
   for(const d of S.divers){
+    if(S.frozenAt){ if(d.state==='landed') d.landT+=dt; continue; }
     if(d.state==='wait'&&S.t>=d.tDrop&&!S.failed){
       d.y=planeYAt(d.wx)+0.025; SFX.drop();
       if(d.faulty){ d.state='pre'; d.v=VPRE; d.chuteT=0 } else { d.state='fall'; d.v=V0 }

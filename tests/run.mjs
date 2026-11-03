@@ -81,6 +81,7 @@ console.log('Result screen and rules:');
   const t = await tiles(page);
   ok(count(t, 'miss') === 3 && count(t, 'none') === t.length - 3, 'fail strip shows exactly 3 💔, the rest grey', t.join(','));
   ok(await vis(page, 'rFail'), '"LEVEL FAILED" title shown');
+  ok(await page.evaluate(() => window.__chute.state().divers.some(d => d.state === 'fall')), 'last life gone: divers in the air stay frozen until the result');
   ok(!(await vis(page, 'nextBtn')), 'no Next button on a fail');
   ok(errors.length === 0, 'no page errors', errors.join(' | '));
   await page.close();

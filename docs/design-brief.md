@@ -14,7 +14,7 @@ A plane flies left to right across the top of the screen and drops skydivers ove
 - **Above the band, under the radar** (too early): lands safely, costs ❤.
 - **In the band**: PERFECT.
 - **Below the band**, chute opened: **CRASH!** — costs ❤. **No chute**: **SPLAT** — costs ❤.
-- Lose all 3 → **"NO MORE LIVES"** (user prefers "lives" over "hearts" in text). After the last life is lost, nothing else counts (v6.7). Cartoony only; Poki-safe.
+- Lose all 3 → **"NO MORE LIVES"** (user prefers "lives" over "hearts" in text). After the last life is lost, nothing else counts (v6.7), and the world freezes at once: divers, plane and scenery stop while the banner and effects play, so tapping on doesn't feel ignored. Being caught by radar keeps its own slow-motion sequence. Cartoony only; Poki-safe.
 
 ## Result screen (v6.7)
 - Diver strip: tick = perfect; 💔 = any landing that cost a life; grey dot = didn't count. ★ means level rating only.

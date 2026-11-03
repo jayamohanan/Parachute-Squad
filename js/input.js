@@ -69,7 +69,7 @@ function loseHeart(d){
   S.misses++;
   if(!S.heartsMax) return;
   S.hearts--; S.heartLostT=S.t;
-  if(S.hearts<=0){ S.failed=true; S.endAt=S.t+1.5; S.banner={text:'NO MORE LIVES',t:0,dur:1.5,col:'#ff6b5e'}; SFX.droneStop(); SFX.fail(); }
+  if(S.hearts<=0){ S.failed=true; S.frozenAt=performance.now(); S.endAt=S.t+1.5; S.banner={text:'NO MORE LIVES',t:0,dur:1.5,col:'#ff6b5e'}; SFX.droneStop(); SFX.fail(); }
 }
 function caught(d){   // spotted by radar: the level ends on the spot
   if(!S||S.failed) return;

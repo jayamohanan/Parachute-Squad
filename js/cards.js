@@ -179,10 +179,6 @@ function drawRadarCard(g,Wc,Hc){
   cardPost(g,292,groundY,1);
   const B1={x:48,y:124}, B2={x:222,y:bandTop+bandH-2};   // reads top-left to bottom-right, like the how-to card
   drawDiver(mk('fall'),B1.x,B1.y,1.25,0);
-  const tip={x:B2.x-6,y:B2.y-58}, a=Math.atan2(tip.y-B1.y,tip.x-B1.x), ca=Math.cos(a), sa=Math.sin(a);
-  g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2;
-  g.beginPath(); g.moveTo(B1.x+ca*14,B1.y+sa*14); g.lineTo(tip.x-ca*10,tip.y-sa*10); g.stroke(); g.setLineDash([]);
-  g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(tip.x,tip.y); g.lineTo(tip.x-ca*10-sa*6,tip.y-sa*10+ca*6); g.lineTo(tip.x-ca*10+sa*6,tip.y-sa*10-ca*6); g.fill();
   drawDiver(mk('chute'),B2.x,B2.y,1.25,0);
   cardHand(g,B2.x-30,B2.y-4);
   cardText(g,B2.x+44,bandTop-48,'✓ Safe',19,'#9ff2c4','center');
