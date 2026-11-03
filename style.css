@@ -309,7 +309,8 @@ body:not(.levels) .lvonly{display:none!important}
 
 /* Phone on its side: screens rearrange to use the width instead of scrolling (same test as shortWide() in js/render.js) */
 @media (orientation:landscape) and (max-height:500px){
-  .ov{padding-block:8px}
+  :root{padding-bottom:0}   /* the game runs under the iPhone's home bar; menus below stay clear of it */
+  .ov{padding-block:8px max(8px, env(safe-area-inset-bottom, 0px))}
   .card{padding:12px 14px}
   .end{overflow:hidden}
   .sheet{max-width:760px}
