@@ -82,7 +82,7 @@ function newLevelRound(n){
   const T=TEMPO[L.tempo], ci=L.dummies, hs=L.d.filter(x=>x!=='gap'), N=ci+hs.length;
   const night=helper==='night', wide=helper==='wide', lead=offerNext?Math.ceil(HELP_OFFER/T):0;   // lead: empty beats while the retry offer is up
   helper=null; offerNext=false;
-  S={T,ci,N,radar:n>=RADAR_FROM,mode:'steps',bandScale:(BANDSCALE[L.band]||1)*(wide?HELP_WIDE:1),dive:false,clouds:night?'off':L.clouds||'off',night,lead,t0:lead*T,offerEnd:lead?HELP_OFFER:null,slopeSpan:hs.length+2,
+  S={T,ci,N,radar:n>=RADAR_FROM&&!hs.some(x=>x.faulty),mode:'steps',bandScale:(BANDSCALE[L.band]||1)*(wide?HELP_WIDE:1),dive:false,clouds:night?'off':L.clouds||'off',night,lead,t0:lead*T,offerEnd:lead?HELP_OFFER:null,slopeSpan:hs.length+2,
      divers:[],t:0,particles:[],pops:[],streak:0,best:0,perf:0,shake:0,banner:null,humansShown:ci===0,endAt:null,
      tempoKey:L.tempo,cfg:Object.assign({},settings),fixes:0,humansN:hs.length,level:n,
      tut:L.tut?{idx:0,done:false,show:false,k:1}:null,

@@ -95,6 +95,9 @@ function drawSteamCard(g,Wc,Hc){
   drawDiver(cardMk('fall'),cx,150,1.25,0);
   g.strokeStyle='rgba(255,255,255,.9)'; g.lineWidth=2; for(const dx of [-14,0,14]){ g.beginPath(); g.moveTo(cx+dx,108); g.lineTo(cx+dx,96); g.stroke(); }
   cardText(g,cx+62,160,'Slow…',19,'#ffffff','center');
+  // small arrows rising inside the steam: it pushes up against the fall
+  g.lineCap='round'; g.lineJoin='round'; g.strokeStyle='rgba(19,34,56,.45)'; g.lineWidth=2;
+  for(const x of [cx-14,cx,cx+14]){ g.beginPath(); g.moveTo(x,198); g.lineTo(x,180); g.moveTo(x-4,185); g.lineTo(x,180); g.lineTo(x+4,185); g.stroke(); }
   drawDiver(cardMk('chute'),cx,top-28,1.25,0); cardHand(g,cx+34,top-22);
   cardText(g,Wc/2,395,'Steam slows divers down. Wait for it!',15,'#ffffff','center');
 }
@@ -113,17 +116,17 @@ function drawLiftCard(g,Wc,Hc){
   drawDiver(cardMk('fall'),115,128,1.25,0);
   g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2; g.beginPath(); g.moveTo(115,140); g.lineTo(115,180); g.stroke(); g.setLineDash([]);
   drawDiver(cardMk('chute'),115,plat-26,1.25,0); cardHand(g,152,plat-20);
-  cardText(g,Wc/2,395,'The green zone rides the lift',15,'#ffffff','center');
+  cardText(g,Wc/2,395,'Platforms move up and down',15,'#ffffff','center');
 }
 function drawCloudCard(g,Wc,Hc){
-  const groundY=372, base=236, bandTop=272; cardScene(g,Wc,Hc,groundY);
+  const groundY=372, base=236, bandTop=314; cardScene(g,Wc,Hc,groundY);   // band low over the ground, as in play
   cardText(g,Wc/2,34,'Clouds!',26,'#ffffff','center'); drawPlane(250,62,0.7);
   cardBand(g,0,Wc,bandTop,22);
+  drawDiver(cardMk('fall'),110,base+22,1.25,0);   // drawn before the clouds: top half hidden, lower half showing below them
   for(const [x,y,r] of [[10,200,40],[60,212,36],[110,196,44],[165,214,40],[220,198,44],[275,210,40],[320,198,40],[40,170,34],[140,166,36],[250,168,34],[300,176,30],[90,180,30],[200,176,32]]){
     g.fillStyle='rgba(205,220,240,.95)'; g.beginPath(); g.arc(x,y+6,r,0,Math.PI*2); g.fill(); }
   for(const [x,y,r] of [[10,196,36],[60,206,32],[110,190,40],[165,208,36],[220,192,40],[275,204,36],[320,192,36],[40,164,30],[140,160,32],[250,162,30],[300,170,26],[90,174,26],[200,170,28]]){
     g.fillStyle='#ffffff'; g.beginPath(); g.arc(x,y,r,0,Math.PI*2); g.fill(); }
-  drawDiver(cardMk('fall'),110,base+20,1.25,0);   // just dropping out of the cloud
   g.fillStyle='#ff3b3b'; g.beginPath(); g.arc(142,base-8,11,0,Math.PI*2); g.fill(); g.fillStyle='#fff'; g.font='bold 15px "Lilita One", system-ui, sans-serif'; g.textAlign='center'; g.fillText('!',142,base-3);
   cardHand(g,152,bandTop+22);
   cardText(g,Wc/2,395,'Clouds hide your divers. Be ready!',15,'#ffffff','center');
@@ -132,14 +135,19 @@ function drawFaultyCard(g,Wc,Hc){
   const groundY=372, bandTop=290; cardScene(g,Wc,Hc,groundY);
   cardText(g,Wc/2,34,'Broken chutes!',26,'#ffffff','center'); drawPlane(250,62,0.7);
   cardBand(g,0,Wc,bandTop,22);
-  const A={x:190,y:150};
+  // three moments, top left to bottom right (the plane flies right): chute open, chute pops, new chute in the green
+  const O={x:50,y:122}, A={x:132,y:198}, B={x:226,y:bandTop+20};
+  drawDiver(cardMk('chute'),O.x,O.y,1.25,0);
   drawDiver(cardMk('fall'),A.x,A.y,1.25,0);
   g.fillStyle=CARD_SUIT; for(const [dx,dy,r] of [[-26,-54,0.5],[18,-62,-0.4],[-6,-74,0.2],[30,-44,0.9]]){ g.save(); g.translate(A.x+dx,A.y+dy); g.rotate(r); g.fillRect(-8,-4,16,8); g.restore(); }
   g.fillStyle='#fff'; for(const [dx,dy] of [[-14,-66],[10,-50]]){ g.fillRect(A.x+dx,A.y+dy,8,5); }
-  cardText(g,A.x-52,A.y-40,'POP!',22,'#ffffff','center');
-  g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2; g.beginPath(); g.moveTo(A.x-10,A.y+10); g.lineTo(100,bandTop-74); g.stroke(); g.setLineDash([]);
-  g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(96,bandTop-66); g.lineTo(108,bandTop-74); g.lineTo(96,bandTop-80); g.fill();
-  drawDiver(cardMk('chute'),86,bandTop+20,1.25,0); cardHand(g,122,bandTop+24);
+  cardText(g,A.x+62,A.y-40,'POP!',22,'#ffffff','center');
+  const arrow=(x0,y0,x1,y1)=>{ const a=Math.atan2(y1-y0,x1-x0), ca=Math.cos(a), sa=Math.sin(a);
+    g.setLineDash([3,5]); g.strokeStyle='rgba(255,255,255,.85)'; g.lineWidth=2; g.beginPath(); g.moveTo(x0,y0); g.lineTo(x1-ca*10,y1-sa*10); g.stroke(); g.setLineDash([]);
+    g.fillStyle='rgba(255,255,255,.9)'; g.beginPath(); g.moveTo(x1,y1); g.lineTo(x1-ca*10-sa*6,y1-sa*10+ca*6); g.lineTo(x1-ca*10+sa*6,y1-sa*10-ca*6); g.fill(); };
+  arrow(O.x+22,O.y+8,A.x-24,A.y-34);
+  arrow(A.x+20,A.y+6,B.x-30,B.y-58);
+  drawDiver(cardMk('chute'),B.x,B.y,1.25,0); cardHand(g,B.x+36,B.y+4);
   cardText(g,Wc/2,395,'Chute popped? Open a new one in the green!',14,'#ffffff','center');
 }
 // "RADAR ZONE" marker: a long double-headed arrow whose tips touch the top and bottom of the zone, label beside it.
@@ -180,14 +188,14 @@ function drawRadarCard(g,Wc,Hc){
   drawPlane(262,60,0.75);   // the plane flies above the radar
   const SUIT='#ff5a36', mk=(state,chuteT=1)=>({i:0,suit:SUIT,state,chuteT,heavy:false,dummy:false});
   // MIDDLE: opened inside the radar -> caught
-  const A={x:150,y:178};
+  const A={x:120,y:205};   // on the straight line between the top and bottom divers, still inside the zone
   const post=cardPost(g,34,groundY,1);
   g.fillStyle='rgba(255,240,150,.55)'; g.beginPath(); g.moveTo(post.x,post.y); g.lineTo(A.x-24,A.y-60); g.lineTo(A.x+26,A.y-44); g.closePath(); g.fill();
   drawDiver(mk('chute'),A.x,A.y,1.3,0);
   cardHand(g,A.x+32,A.y+6);
   g.fillStyle='#ff3b3b'; g.beginPath(); g.arc(A.x+22,A.y-72,11,0,Math.PI*2); g.fill();
   g.fillStyle='#fff'; g.font='bold 15px "Lilita One", system-ui, sans-serif'; g.textAlign='center'; g.fillText('!',A.x+22,A.y-67);
-  cardText(g,A.x-54,A.y+40,'✕ Caught!',19,'#ff8a7a','center');
+  cardText(g,A.x-58,A.y+18,'✕ Caught!',19,'#ff8a7a','center');
   // LEFT to RIGHT: fall through closed, open below the radar -> safe
   cardPost(g,292,groundY,1);
   const B1={x:48,y:124}, B2={x:222,y:bandTop+bandH-2};   // reads top-left to bottom-right, like the how-to card

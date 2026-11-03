@@ -56,6 +56,7 @@ A plane flies left to right across the top of the screen and drops skydivers ove
 - 3 lives per level; stars = lives left; result shows hearts flipping into stars. Level grid shows three stars on every open level, unearned ones grey.
 
 ## Radar
+- No radar on levels with broken chutes (all of World 5): those divers drift down under an open chute, usually through the red zone, which contradicts "don't open your chute in it". Too-early taps there cost a life, not the level.
 - Mainly a theme enhancer. Flat height per level (0.10 above the highest band top, lifts' highest reach); flat light red fill below the plane; drop guard 0.3 s.
 - v6.7: "RADAR ZONE" marker (red double arrow spanning the zone) on the radar intro card and in the world at the start of radar levels; it scrolls off before the first band.
 

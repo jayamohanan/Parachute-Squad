@@ -9,6 +9,12 @@ Bundle these into the next build and tell the user each one is included. After a
 4. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Radar card: the middle diver now sits on the straight line between the top and bottom divers, still inside the red zone.
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Moving lifts card text: "Platforms move up and down".
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Clouds card: green band moved down near the ground, as in play; the diver is now half hidden, top half behind the clouds and lower half below them.
+- **After v6.7 (2026-11-03), version number unchanged. Not run: `npm test` and game play not run, new check in `tests/run.mjs` is unproven; on `playtest-next-build`.** No radar on levels with broken chutes (all of World 5, Levels 41-50). User to judge whether the world still feels hard enough without instant fails.
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Steam card: three small, straight, faint arrows inside the steam, to show it pushes up against the fall.
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Broken chutes card now reads top left to bottom right, matching the plane flying right, and shows three moments: chute open, chute pops, new chute in the green.
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Removed the yellow stars from the steam, lifts, clouds and broken chutes cards (★ = level rating only).
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Clouds card text: "Clouds hide your divers. Be ready!"; hidden screen-reader text changed too.
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Dev ⚙ controls: new Tut cards button flips through the how-to card and all intro cards with ◀ ▶ (Space also goes on), without marking any as seen. The graduation card isn't included, since it shows a real result. Goes when the dev controls are removed before Poki release. User asked for this; it wasn't on the pending list.
