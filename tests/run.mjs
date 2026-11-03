@@ -6,6 +6,7 @@
 import { chromium } from 'playwright';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import path from 'node:path';
+import { readFileSync, readdirSync } from 'node:fs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const URL = pathToFileURL(path.join(ROOT, 'index.html')).href;
@@ -24,6 +25,11 @@ const BOT = `window.__bot=(missIdx,mode)=>{ missIdx=missIdx||[]; if(window.__bi)
 
 let failures = 0, passes = 0;
 const ok = (cond, name, extra = '') => { if (cond) { passes++; console.log('  ✓ ' + name); } else { failures++; console.log('  ✗ ' + name + (extra ? '  → ' + extra : '')); } };
+
+// Poki bans external references. w3.org only appears as the SVG namespace, which is never fetched.
+const SOURCES = ['index.html', 'style.css', ...readdirSync(path.join(ROOT, 'js')).map(f => 'js/' + f)];
+const external = SOURCES.filter(f => /https?:\/\/(?!www\.w3\.org\/)/.test(readFileSync(path.join(ROOT, f), 'utf8')));
+ok(external.length === 0, 'no external references', external.join(', '));
 
 const browser = await chromium.launch(process.env.CHROME_PATH ? { executablePath: process.env.CHROME_PATH } : {});
 

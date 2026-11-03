@@ -44,6 +44,9 @@ rm "$BUNDLE"
 "$ESBUILD" style.css --minify --target=es2020 --charset=utf8 --legal-comments=none \
   --log-level=warning --outfile="$ASSETS/style.css"
 
+# Fonts go beside the built CSS, whose url("fonts/...") paths are relative to it
+cp -R fonts "$ASSETS/fonts"
+
 # 6. Fingerprint, so a new build is never served from an old cache
 JS_NAME=game.$(hash8 "$ASSETS/game.js").js
 CSS_NAME=style.$(hash8 "$ASSETS/style.css").css
@@ -54,6 +57,7 @@ mv "$ASSETS/style.css" "$ASSETS/$CSS_NAME"
 # Line breaks stay, so spacing between inline elements renders the same.
 sed -e '/<script src="js\//d' \
     -e "s#href=\"style.css\"#href=\"assets/$CSS_NAME\"#" \
+    -e 's#href="fonts/#href="assets/fonts/#' \
     -e "s#</body>#<script src=\"assets/$JS_NAME\"></script></body>#" \
     -e '/^[[:space:]]*<!--.*-->[[:space:]]*$/d' \
     -e 's/^[[:space:]]*//' \
