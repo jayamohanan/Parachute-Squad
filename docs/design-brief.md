@@ -39,7 +39,7 @@ A plane flies left to right across the top of the screen and drops skydivers ove
 ## Worlds & levels (built v6.0)
 - 5 worlds × 10 levels (HUD "Level N", counted across worlds: World 2 starts at Level 11). Unlock: next level after ≥1★; new world on the running star total: 25★, 50★, 75★, 100★ (or gate ad). ‹ › world switcher.
 - Recipe format: number = height (0, Lo .06, Mi .12, Ta .18, Hi .24); `V(h)` steam vent, `P(h)` moving lift, `F(h)` faulty chute; options `band`, `clouds`. All 50 bot-cleared ★★★; not yet human-tested.
-- W1 Training ground: Find the beat · Picking up speed · Hold your nerve · First rooftop · Rooftops (radar card) · Stairs · Double tap · Don't rush · Skyline · Grand finale.
+- W1 Drop Zone: Find the beat · Picking up speed · Hold your nerve · First rooftop · Rooftops (radar card) · Stairs · Double tap · Don't rush · Skyline · Grand finale.
 - W2 City rooftops: Rush hour · Fast lane · High rise · Steam (steam card) · Hot air · Wait for it · Thin air · Steam stairs · Smog · Rooftop finale.
 - W3 Base elevators: Going up (lift card) · Lifts · Elevator music · Up and down · Double lift · Steam lift · Thin lift · Fast floors · Shaft · Base elevators.
 - W4 Cloud cover: Fog (clouds card) · Cloud cover · Blind beat · Peekaboo · Steam in the fog · Lifts in the fog · Thin fog · Storm · Pea soup · Whiteout.

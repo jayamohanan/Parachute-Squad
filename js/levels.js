@@ -105,7 +105,7 @@ LEVELS.push(
   L3('Final mission','fast',[0,Lo,V(Mi),F(0),P(Lo),Hi,F(Mi),V(Lo),P(0),Ta],{band:'thin'}),
 );
 const WORLDS=[
-  {name:'Training ground'},{name:'City rooftops'},{name:'Base elevators'},{name:'Cloud cover'},{name:'Sabotage'},
+  {name:'Drop Zone'},{name:'City rooftops'},{name:'Base elevators'},{name:'Cloud cover'},{name:'Sabotage'},
 ];
 const PER_WORLD=10, W_NEED=25;   // running star total opens worlds: World 2 at 25★, World 3 at 50★, World 4 at 75★... stars are never spent
 const worldOf=n=>Math.floor(n/PER_WORLD);
