@@ -4,7 +4,7 @@ let howMode='start', howIntro=null;
 const INTROS=[
   {key:'steam', level:13, draw:drawSteamCard, aria:'Steam vents. Steam blows up from some roofs and slows the diver down. Wait for the diver to reach the green zone.'},
   {key:'lift', level:20, draw:drawLiftCard, aria:'Moving lifts. Some landing spots move up and down and the green zone moves with them. Tapping stops the lift.'},
-  {key:'clouds', level:30, draw:drawCloudCard, aria:'Clouds. Divers drop out of the clouds just above the green zone. Be ready to tap.'},
+  {key:'clouds', level:30, draw:drawCloudCard, aria:'Clouds. Clouds hide your divers until just above the green zone. Be ready to tap.'},
   {key:'faulty', level:40, draw:drawFaultyCard, aria:'Broken chutes. Some chutes pop off by themselves. Open a new one in the green zone.'},
   {key:'radar', level:RADAR_FROM, draw:drawRadarCard,
    aria:'Radar ahead. Open your chute in the red zone and you get caught. Don\'t open your chute in it.'},
@@ -127,7 +127,7 @@ function drawCloudCard(g,Wc,Hc){
   drawDiver(cardMk('fall'),110,base+20,1.25,0);   // just dropping out of the cloud
   g.fillStyle='#ff3b3b'; g.beginPath(); g.arc(142,base-8,11,0,Math.PI*2); g.fill(); g.fillStyle='#fff'; g.font='bold 15px "Lilita One", system-ui, sans-serif'; g.textAlign='center'; g.fillText('!',142,base-3);
   cardHand(g,152,bandTop+22); cardStar(g,70,bandTop-12,10);
-  cardText(g,Wc/2,395,'Divers drop out of the clouds. Be ready!',15,'#ffffff','center');
+  cardText(g,Wc/2,395,'Clouds hide your divers. Be ready!',15,'#ffffff','center');
 }
 function drawFaultyCard(g,Wc,Hc){
   const groundY=372, bandTop=290; cardScene(g,Wc,Hc,groundY);
