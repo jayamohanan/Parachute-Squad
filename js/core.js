@@ -10,7 +10,7 @@ const settings=Object.assign({},DEF);
 try{const s=JSON.parse(store.get('chuteRhythm.v3.settings')||'{}');for(const k in DEF) if(k in s) settings[k]=s[k]}catch(e){}
 const VKEYS=['platforms','faulty','heavy','dive','vents','clouds'];
 let S=null, running=false, lastTS=0;
-const AD_ICO='<i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="adtag">AD</b>';   // every rewarded-ad button starts with this
+const AD_ICO='<i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="tvtag">AD</b>';   // every rewarded-ad button starts with this
 // Countdown stroke around a button: full at the start, draining anticlockwise back to top centre.
 function drainRing(el,ms,r){
   const old=el.querySelector('.drainring'); if(old) old.remove();

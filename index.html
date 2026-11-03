@@ -44,8 +44,8 @@
     <div class="pauseov" id="pauseOv" hidden><i class="ico lg i-next" aria-hidden="true"></i><span id="pauseHint"></span></div>
     <div class="helpov" id="helpOv" hidden>
       <div class="helprow">
-        <button class="helpbtn" id="helpWide"><i class="ico lg i-wide" aria-hidden="true"></i><span class="helpad"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="adtag">AD</b></span><small class="helplbl">Wider green</small></button>
-        <button class="helpbtn" id="helpNight"><i class="ico lg i-moon" aria-hidden="true"></i><span class="helpad"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="adtag">AD</b></span><small class="helplbl">Night jump</small></button>
+        <button class="helpbtn" id="helpWide"><i class="ico lg i-wide" aria-hidden="true"></i><span class="helpad"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="tvtag">AD</b></span><small class="helplbl">Wider green</small></button>
+        <button class="helpbtn" id="helpNight"><i class="ico lg i-moon" aria-hidden="true"></i><span class="helpad"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="tvtag">AD</b></span><small class="helplbl">Night jump</small></button>
       </div>
       <div class="helphint" id="helpHint"></div>
     </div>
@@ -109,7 +109,7 @@
         <div class="shophead"><h2>Store</h2><span class="coinpill"><i class="coin"></i><span id="shopCoins">0</span></span></div>
         <div class="tabs" role="tablist"><button class="tab on" data-tab="chute">Chutes</button><button class="tab" data-tab="diver">Divers</button><button class="tab" data-tab="plane">Planes</button></div>
         <div class="shopgrid" id="shopGrid"></div>
-        <div class="shopfoot"><button class="btn sm" id="adCoins"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="adtag">AD</b> +100 <i class="coin sm"></i></button><button class="btn ghost sm" id="shopBack">Back</button></div>
+        <div class="shopfoot"><button class="btn sm" id="adCoins"><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="tvtag">AD</b> +100 <i class="coin sm"></i></button><button class="btn ghost sm" id="shopBack">Back</button></div>
       </div>
     </div>
     <div class="ov end" id="endOv" hidden>
@@ -138,11 +138,11 @@
       <div class="card wpop">
         <h1 id="wpTitle"></h1>
         <p id="wpNeed"></p>
-        <div class="actions"><button class="btn" id="rGate" hidden><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="adtag">AD</b> Unlock now</button><button class="btn ghost" id="wpLevels">Levels</button><button class="btn ghost" id="wpClose">Close</button></div>
+        <div class="actions"><button class="btn" id="rGate" hidden><i class="ico i-ad" role="img" aria-label="Watch ad"></i><b class="tvtag">AD</b> Unlock now</button><button class="btn ghost" id="wpLevels">Levels</button><button class="btn ghost" id="wpClose">Close</button></div>
       </div>
     </div>
     <div class="ov" id="adOv" hidden>
-      <div class="card adcard"><div class="adlbl">AD</div><div class="adbox">Ad playing…</div><div class="adbar"><i id="adFill"></i></div>
+      <div class="card vidcard"><div class="vidlbl">AD</div><div class="vidbox">Ad playing…</div><div class="vidbar"><i id="adFill"></i></div>
         <button class="resetbtn" id="adClose">Close (no reward)</button></div>
     </div>
   </div>
@@ -160,7 +160,6 @@
 <script src="js/loop.js"></script>
 <script src="js/result.js"></script>
 <script src="js/store.js"></script>
-<script src="js/adlog.js"></script>
 <script src="js/main.js"></script>
 </body>
 </html>
