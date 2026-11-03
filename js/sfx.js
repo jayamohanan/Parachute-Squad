@@ -91,6 +91,8 @@ const SFX=(()=>{
     chord(){ for(const [f,v] of [[262,0.10],[392,0.09],[523,0.09],[659,0.07]]){ tone('triangle',f,f,1.1,v); tone('sine',f*1.003,f*1.003,1.1,v*0.4,0.02); } },
     // a level is lost: short falling "wah-wah", nothing like the win sounds
     fail(){ [[311,294],[294,277],[277,233]].forEach(([a,b],i)=>tone('triangle',a,b,i===2?0.6:0.24,0.15,i*0.26)); tone('sine',117,98,0.6,0.12,0.52); },
+    // coins arrive in the total: one soft two-note clink
+    coin(){ tone('triangle',660,660,0.1,0.1); tone('triangle',880,880,0.18,0.09,0.07); },
     // world unlocked on the result screen
     worldOpen(){ [392,523,659,784].forEach((f,i)=>tone('triangle',f,f,i===3?0.5:0.14,0.13,i*0.09)); }
   };

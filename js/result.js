@@ -6,7 +6,7 @@ let resultSeq=0;   // bumps every time a result is shown or left, so delayed eff
 // opens or a button is pressed — never at the end of an animation — so skipping can't lose anything.
 let resultTimers=[];
 function rt(fn,ms){ const id=setTimeout(()=>{ resultTimers=resultTimers.filter(x=>x!==id); fn(); },ms); resultTimers.push(id); return id; }
-function leaveResult(){ resultSeq++; for(const id of resultTimers) clearTimeout(id); resultTimers=[]; SFX.cutAll(); $('wPop').hidden=true; }
+function leaveResult(){ resultSeq++; for(const id of resultTimers) clearTimeout(id); resultTimers=[]; SFX.cutAll(); clearFlyCoins(); coinFx=null; $('wPop').hidden=true; }
 function showEnd(){
   resultSeq++; $('strip').className='strip'; $('strip').style.minHeight='';
   if(S.training){   // training never fails. First time (and "Practice again" from the card): graduation card. From "?": back to the levels.
@@ -115,6 +115,7 @@ function showLevelEnd(){
     },t0);
     doneAt=Math.max(doneAt,t0+t1+1600);
   }
+  if(earned){ const seq=resultSeq; rt(()=>{ if(seq===resultSeq&&$('adOv').hidden) sendCoins(); },reduceMotion?0:doneAt); }   // an open ad holds them back: it sends them when it ends
   // buttons; the last level of a world always shows the way to the next world
   const won=passed||prevSt>0;   // failed a replay of a level already won: Next is offered, Retry stays the main button
   const toWorld=worldEnd&&won, hasNext=toWorld||(won&&n<LEVELS.length-1&&unlocked(n+1));
@@ -154,10 +155,47 @@ function playWorldUnlock(nw){   // lock shakes, opens, UNLOCKED! stamp + confett
 }
 
 // ---------- result screen: coins + reward track ----------
+// Coins are saved before any of this runs; the animations only show them arriving.
+const FLY_N=10, FLY_GAP=45, FLY_MS=520, FLY_TOTAL=(FLY_N-1)*FLY_GAP+FLY_MS;
+let flying=[];
+function clearFlyCoins(){ for(const c of flying) c.remove(); flying=[]; }
+function flyCoins(fromEl,toEl){
+  const a=fromEl.getBoundingClientRect(), b=toEl.getBoundingClientRect(), x0=a.left+a.width/2, y0=a.top+a.height/2, dx=b.left+b.width/2-x0, dy=b.top+b.height/2-y0;
+  for(let i=0;i<FLY_N;i++){
+    const c=document.createElement('i'); c.className='coin flycoin'; c.style.left=x0+'px'; c.style.top=y0+'px';
+    document.body.appendChild(c); flying.push(c);
+    c.animate([{transform:'translate(0,0) scale(.8)',opacity:1},{transform:`translate(${dx/2}px,${dy/2-34}px) scale(1.15)`,opacity:1,offset:.5},{transform:`translate(${dx}px,${dy}px) scale(.7)`,opacity:1}],
+      {duration:FLY_MS,delay:i*FLY_GAP,easing:'ease-in',fill:'both'}).onfinish=()=>{ c.remove(); flying=flying.filter(x=>x!==c); };
+  }
+}
+function popEl(el){ el.animate([{transform:'scale(1)'},{transform:'scale(1.28)'},{transform:'scale(1)'}],{duration:280,easing:'ease-out'}); }
+function countUp(el,from,to,ms,alive){
+  const t0=performance.now();
+  const step=()=>{ if(!alive()) return; const f=Math.min(1,(performance.now()-t0)/ms);
+    el.textContent=Math.round(from+(to-from)*f); if(f<1) requestAnimationFrame(step); };
+  step();
+}
+let coinFx=null;   // what the result's coin row has shown so far: the total on screen, and coins not yet sent to it
+function sendCoins(){
+  const fx=coinFx; if(!fx||!fx.pend) return;
+  const seq=resultSeq, from=fx.shown, to=from+fx.pend, tot=$('rCoinTotal'), pill=$('rTotalPill'); fx.pend=0; fx.shown=to;
+  if(reduceMotion){ tot.textContent=to; popEl(pill); SFX.coin(); return; }
+  flyCoins($('rCoinIco'),pill);
+  rt(()=>countUp(tot,from,to,FLY_TOTAL-FLY_MS,()=>seq===resultSeq),FLY_MS);
+  rt(()=>{ tot.textContent=to; popEl(pill); SFX.coin(); },FLY_TOTAL);
+}
 function renderCoinRow(earned){
-  const el=$('rCoins'); if(!earned){ el.innerHTML=''; return; }
-  el.innerHTML=`<i class="coin"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">${AD_ICO} ×2</button>`;
-  $('dblBtn').onclick=()=>watchAd(()=>{ prog.coins+=earned; saveProg(); $('rCoinN').textContent=earned*2; const b=$('dblBtn'); b.disabled=true; b.textContent='Doubled!'; });
+  const el=$('rCoins'); coinFx=null; if(!earned){ el.innerHTML=''; return; }
+  coinFx={shown:prog.coins-earned,pend:earned};
+  el.innerHTML=`<i class="coin" id="rCoinIco"></i><span>+<span id="rCoinN">${earned}</span></span><button class="btn" id="dblBtn">${AD_ICO} ×2</button><span class="coinpill" id="rTotalPill"><i class="coin"></i><span id="rCoinTotal">${coinFx.shown}</span></span>`;
+  $('dblBtn').onclick=()=>watchAd(()=>{
+    prog.coins+=earned; saveProg(); coinFx.pend+=earned;
+    const b=$('dblBtn'), n=$('rCoinN'), seq=resultSeq; b.disabled=true; b.textContent='Doubled!';
+    popEl(n.parentElement);
+    if(reduceMotion){ n.textContent=earned*2; sendCoins(); return; }
+    countUp(n,earned,earned*2,650,()=>seq===resultSeq);
+    rt(()=>{ popEl(n.parentElement); sendCoins(); },750);
+  },sendCoins);
 }
 function drawSilhouette(cv,kind,id,frac){
   const off=document.createElement('canvas'); off.width=cv.width; off.height=cv.height; itemThumb(off,kind,id);
