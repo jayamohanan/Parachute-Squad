@@ -2,9 +2,9 @@
 let adCb=null, adCancel=null, adTimer=0;
 function watchAd(onDone,onCancel){
   const ov=$('adOv'), fill=$('adFill'); ov.hidden=false;
-  fill.style.transition='none'; fill.style.width='0'; void fill.offsetWidth; fill.style.transition='width 2s linear'; fill.style.width='100%';
+  fill.style.transition='none'; fill.style.width='0'; void fill.offsetWidth; fill.style.transition='width 15s linear'; fill.style.width='100%';
   adCb=onDone; adCancel=onCancel||null; clearTimeout(adTimer);
-  adTimer=setTimeout(()=>{ ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },2000);
+  adTimer=setTimeout(()=>{ ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },15000);
 }
 $('adClose').addEventListener('click',()=>{ clearTimeout(adTimer); adCb=null; $('adOv').hidden=true; const c=adCancel; adCancel=null; if(c) c(); });
 

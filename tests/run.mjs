@@ -139,7 +139,7 @@ console.log('Result screen and rules:');
   await playUntilEnd(page, 9); await page.clock.runFor(2500);
   await page.click('#nextBtn');
   ok(await vis(page, 'rGate'), '"Unlock now" offered in the popup at 23★');
-  await page.click('#rGate'); await page.clock.runFor(3200);
+  await page.click('#rGate'); await page.clock.runFor(16200);
   ok((await progOf(page)).gate[1] === 1, 'gate ad unlock saved');
   ok(await vis(page, 'nextBtn'), '"World 2 ▶" shown after the ad');
   ok(errors.length === 0, 'no page errors', errors.join(' | '));

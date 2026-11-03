@@ -7,7 +7,7 @@ Companion to `docs/design-brief.md`.
 - **Cosmetics are visual only** — same size, same timing, must stay readable against sky and band.
 - **No single ad buys anything big:** commons 1 ad, rares 3 ads (progress kept: "📺 1/3"), epic/legendary coins only.
 - **Stars stay earned-only.** World gate ad unlocks the next world instead of adding stars (user picked this over "+3 stars").
-- Rewarded ads follow Poki's rules: optional, clearly announced, reward only when the ad finishes. Prototype uses a fake 2 s ad overlay ("Close (no reward)" cancels) standing in for `PokiSDK.rewardedBreak`.
+- Rewarded ads follow Poki's rules: optional, clearly announced, reward only when the ad finishes. Prototype uses a fake 15 s ad overlay ("Close (no reward)" cancels) standing in for `PokiSDK.rewardedBreak`.
 
 ## Ad helpers (agreed with user 2026-11-03; hidden since then, `HELPERS_ON=false`)
 Ad-only, one ad per helper, for the next try only. Stars still equal lives left, so all perfect with a helper is 3★; every level must stay passable without one.
