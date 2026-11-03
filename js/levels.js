@@ -40,10 +40,10 @@ const Lo=0.06, Mi=0.12, Ta=0.18;
 // Training jump: outside the level list. No hearts, can't fail, no stars; flows straight into Level 1 the first time.
 const TRAINING={name:'Training jump', tempo:'slow', dummies:0, hearts:0, tut:true, d:[0,0,0,0,0,0]};
 const LEVELS=[
-  {name:'Find the beat',    tempo:'slow', dummies:0, hearts:3, d:[0,0,0,0,0,0,0,0]},
-  {name:'Picking up speed', tempo:'med',  dummies:0, hearts:3, d:[0,0,0,0,0,0,0,0,0,0]},
-  {name:'Hold your nerve',  tempo:'med',  dummies:0, hearts:3, d:[0,0,0,0,0,'gap',0,0,0,0,0]},
-  {name:'First rooftop',    tempo:'slow', dummies:0, hearts:3, d:[0,0,0,0,Lo,0,0,0,0,0]},
+  {name:'Find the beat',    tempo:'slow', dummies:0, hearts:3, d:[0,0,0,0,0,0]},
+  {name:'Picking up speed', tempo:'med',  dummies:0, hearts:3, d:[0,0,0,0,0,0,0,0]},
+  {name:'Hold your nerve',  tempo:'med',  dummies:0, hearts:3, d:[0,0,0,0,'gap',0,0,0,0]},
+  {name:'First rooftop',    tempo:'slow', dummies:0, hearts:3, d:[0,0,0,0,Lo,0,0,0,0]},
   {name:'Rooftops',         tempo:'med',  dummies:0, hearts:3, d:[0,Lo,0,0,Lo,0,Lo,0,0,Lo]},
   {name:'Stairs',           tempo:'med',  dummies:0, hearts:3, d:[0,0.04,0.08,0.12,0.08,0.04,0,0.04,0.08,0]},
   {name:'Double tap',       tempo:'slow', dummies:0, hearts:3, d:[0,Lo,0,Mi,0,0,Mi,Lo,0,Mi]},

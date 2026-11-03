@@ -9,6 +9,7 @@ Bundle these into the next build and tell the user each one is included. After a
 4. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
+- **After v6.7 (2026-11-03), version number unchanged:** fewer divers early: Levels 1-4 now have 6, 8, 8 (gap kept) and 9; Level 5 and later stay at 10, training at 6. Tests not run; user to playtest. If Level 1 feels like a repeat of training, try 7.
 - **After v6.7 (2026-11-03), version number unchanged. Not run: no game play, `npm test` not run, new checks in `tests/run.mjs` section 14 are unproven; user to playtest:**
   1. Ad helpers: Wide green and Night, offered as timed icons at the start of a retry. Rules in `docs/economy.md`. The ad-only rule and star rule are reworded in `CLAUDE.md`. A retry that shows the offer starts a few empty beats later; lift phase and cloud gaps are offset so the level still matches its seed. Sandbox Band setting gains Wide, to try the size.
   2. Fake ad card: `z-index` above every other screen, the first fix to try for it not showing on mobile. Needs checking on a phone.
