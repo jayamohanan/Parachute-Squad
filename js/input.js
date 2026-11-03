@@ -8,7 +8,7 @@ function tap(){
   if(paused){ resumeRun(); return; }      // this tap only brings the game back
   if(!running||(S&&S.failed)) return;   // caught / out of hearts: input is locked
   if(S&&S.offerEnd!=null){ endOffer(true); return; }   // this tap only starts the level
-  const d=current(); if(!d) return;
+  const d=current(); if(!d||d.state==='pre') return;   // chute hasn't popped yet: nothing to open
   // Level 1 tutorial: ignore blind taps before the finger shows. A tap once it shows always counts: if the diver is still easing into the band, it fires on arrival.
   if(S.tut&&!S.tut.done&&d.i===S.tut.idx&&groundAt(d,S.t)-d.y>d.dmin+d.band){ if(S.tut.show) S.tut.queued=true; return; }
   if(S.t-d.tDrop<DROP_GUARD) return;               // fresh out of the plane: ignore stray/double taps

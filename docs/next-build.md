@@ -9,6 +9,7 @@ Bundle these into the next build and tell the user each one is included. After a
 4. **No action, idea for later:** Level 38 (the user's best guess; Storm) was a pleasure to play. Building heights follow a pattern, it isn't tough, and the rising pitch adds to the rhythm. Possible basis for future rhythm levels.
 
 ## Shipped
+- **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Broken chute levels: the highlight no longer skips a faulty diver before the pop, so it always goes in drop order (level 46 went 1 → 3 → 2 → 3). `current()` now counts the `pre` state too. Rule change: a tap before the pop is ignored; it used to open the next diver's chute early and cost a life. Check added to `tests/run.mjs`, not run.
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Radar card: the middle diver now sits on the straight line between the top and bottom divers, still inside the red zone.
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Moving lifts card text: "Platforms move up and down".
 - **After v6.7 (2026-11-03), version number unchanged. Not run; on `playtest-next-build`.** Clouds card: green band moved down near the ground, as in play; the diver is now half hidden, top half behind the clouds and lower half below them.

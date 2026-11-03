@@ -194,10 +194,10 @@ const CLOUD_SPR=(()=>{
   return {white:mk(a=>`rgba(255,255,255,${a})`),shade:mk(a=>`rgba(203,214,231,${a})`)};
 })();
 
-// Tap target = earliest-dropped diver in free fall. Bands open in drop order (checked above),
-// so a diver whose chute just popped can never take the tap from one already at its band.
+// Tap target = earliest-dropped diver still in the air without a chute open, so the highlight never skips order.
+// A faulty diver counts before the pop too (tap() ignores taps until then).
 function current(){
   if(!S) return null;
-  for(const d of S.divers){ if(d.state==='fall') return d; }
+  for(const d of S.divers){ if(d.state==='fall'||d.state==='pre') return d; }
   return null;
 }
