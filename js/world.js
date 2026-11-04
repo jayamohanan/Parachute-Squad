@@ -82,7 +82,7 @@ function newLevelRound(n){
   const T=TEMPO[L.tempo], ci=L.dummies, hs=L.d.filter(x=>x!=='gap'), N=ci+hs.length;
   const night=helper==='night', wide=helper==='wide', lead=offerNext?Math.ceil(HELP_OFFER/T):0;   // lead: empty beats while the retry offer is up
   helper=null; offerNext=false;
-  S={T,ci,N,radar:n>=RADAR_FROM&&!hs.some(x=>x.faulty),mode:'steps',bandScale:(BANDSCALE[L.band]||1)*(wide?HELP_WIDE:1),dive:false,clouds:night?'off':L.clouds||'off',night,lead,t0:lead*T,offerEnd:lead?HELP_OFFER:null,slopeSpan:hs.length+2,
+  S={T,ci,N,radar:!RHYTHM_ON&&n>=RADAR_FROM&&!hs.some(x=>x.faulty),mode:'steps',bandScale:(BANDSCALE[L.band]||1)*(wide?HELP_WIDE:1),dive:false,clouds:night?'off':L.clouds||'off',night,lead,t0:lead*T,offerEnd:lead?HELP_OFFER:null,slopeSpan:hs.length+2,
      divers:[],t:0,particles:[],pops:[],streak:0,best:0,perf:0,shake:0,banner:null,humansShown:ci===0,endAt:null,
      tempoKey:L.tempo,cfg:Object.assign({},settings),fixes:0,humansN:hs.length,level:n,
      tut:L.tut?{idx:0,done:false,show:false,k:1}:null,
@@ -90,8 +90,8 @@ function newLevelRound(n){
   S.training=n<0; if(n<0) S.banner={text:'TRAINING',t:0,dur:1.8};
   let wx=lead;
   const add=(x,dummy)=>{ const o=typeof x==='object'?x:{h:x}, h=o.h, i=S.divers.length;
-    wx+=(i>0&&S.divers[i-1].faulty)?2:1;   // an empty slot after a faulty diver (same as the sandbox)
-    S.divers.push({i,dummy,heavy:false,faulty:!!o.faulty,vent:!!o.vent&&!night,plat:o.plat&&!night?{ph:rnd(0,Math.PI*2),frozen:null}:null,h,wx,popDelay:0,popFrac:rnd(0,1),band:BAND,bandBase:BAND,dmin:DMIN,enter:0,
+    wx+=(i>0&&o.after!=null)?o.after:(i>0&&S.divers[i-1].faulty)?2:1;   // an empty slot after a faulty diver (same as the sandbox)
+    S.divers.push({i,dummy,heavy:false,note:o.note,noteLen:o.len,faulty:!!o.faulty,vent:!!o.vent&&!night,plat:o.plat&&!night?{ph:rnd(0,Math.PI*2),frozen:null}:null,h,wx,popDelay:0,popFrac:rnd(0,1),band:BAND,bandBase:BAND,dmin:DMIN,enter:0,
       state:'wait',y:0,v:0,opened:false,openY:0,vOpen:0,rating:null,outcome:null,chuteT:0,landT:0,popT:0,
       suit:dummy?'#f2b705':SUITS[(i-ci)%SUITS.length]}) };
   for(let i=0;i<ci;i++) add(0,true);

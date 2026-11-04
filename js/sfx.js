@@ -69,6 +69,7 @@ const SFX=(()=>{
       else if(r==='early') tone('sine',330,300,0.12,0.10);
       else if(r==='late') tone('square',300,240,0.10,0.06);
     },
+    note(midi,dur,delay=0){ const f=440*Math.pow(2,(midi-69)/12); tone('triangle',f,f,dur,0.3,delay); tone('sine',f*2,f*2,dur*0.7,0.08,delay+0.01); },   // song levels
     land(heavy){ tone('sine',heavy?90:120,heavy?45:60,0.14,heavy?0.35:0.25); noise(0.08,0.08,'lowpass',600,200) },
     crash(){ tone('sine',150,45,0.3,0.45); noise(0.22,0.35,'lowpass',1400,140,1); tone('triangle',300,160,0.12,0.1,0.09);
       noise(0.35,0.12,'bandpass',700,300,1.5,0.32) },   // thud, bounce, canopy flump

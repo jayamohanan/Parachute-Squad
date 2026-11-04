@@ -105,6 +105,9 @@ b.tvtag{color:inherit!important;font-weight:800;font-size:.8em;margin:0 3px;lett
 .ico.lg{display:block;width:28px;height:28px;margin:auto}
 .i-next{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M7 4l14 8-14 8z' stroke='%23000' stroke-width='2' stroke-linejoin='round'/%3E%3C/svg%3E")}
 .i-retry{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8M21 3v5h-5' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")}
+.i-tune{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 18V5l11-2v13' fill='none' stroke='%23000' stroke-width='2.2' stroke-linejoin='round'/%3E%3Ccircle cx='6' cy='18' r='3'/%3E%3Ccircle cx='17' cy='16' r='3'/%3E%3C/svg%3E")}
+#replayBtn{display:block;width:100%;margin:8px 0}
+#replayBtn[hidden]{display:none}
 .i-sound{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")}
 .i-muted{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 9.5v5h3.5L12 18.5v-13L7.5 9.5z' stroke='%23000' stroke-width='1.5' stroke-linejoin='round'/%3E%3Cpath d='M16 9.5l5 5M21 9.5l-5 5' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E")}
 .i-levels{--i:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M3 3h5v5H3zM9.5 3h5v5h-5zM16 3h5v5h-5zM3 9.5h5v5H3zM9.5 9.5h5v5h-5zM16 9.5h5v5h-5zM3 16h5v5H3zM9.5 16h5v5h-5zM16 16h5v5h-5z'/%3E%3C/svg%3E")}
@@ -346,4 +349,3 @@ body:not(.levels) .lvonly{display:none!important}
   #howBtn{grid-row:2}
   #howBack{grid-row:3}
 }
-#devTog{display:none!important}   /* dev controls hidden for the Poki snapshot; delete this line to bring the gear back */

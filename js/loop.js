@@ -59,7 +59,7 @@ function start(skipIntro){
   leaveResult();
   setPanel(false);
   if(!skipIntro&&settings.mode==='levels'&&!training){
-    const f=INTROS.find(x=>x.level===curLevel);
+    const f=!RHYTHM_ON&&INTROS.find(x=>x.level===curLevel);
     if(f&&!(prog.seen||[]).includes(f.key)){ stopRun(); showHow('intro',f); return; }
   }
   clearPause();
@@ -92,6 +92,8 @@ let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });
 $('unlockAll').addEventListener('click',e=>{ prog.unlockAll=!prog.unlockAll; saveProg(); syncUnlockAll(); if(!$('levelsOv').hidden) showLevels(true); e.currentTarget.blur(); });
+$('rhythmTog').textContent=RHYTHM_ON?'Back to normal levels':'Rhythm levels';
+$('rhythmTog').addEventListener('click',()=>{ store.set(RHYTHM_KEY,RHYTHM_ON?'0':'1'); location.reload(); });
 function syncUnlockAll(){ $('unlockAll').textContent=prog.unlockAll?'Lock levels again':'Unlock all levels'; }
 // The level the grid highlights and Space starts, from the world on screen only: the last level played if it has no
 // stars, else the next one after it with none, else the first with none in that world. -1 = nothing left to do there.

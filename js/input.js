@@ -40,7 +40,8 @@ function tap(){
   SFX.chute();
   if(!d.dummy){
     if(r==='perfect'){S.streak++;S.best=Math.max(S.best,S.streak);S.perf++} else S.streak=0;
-    SFX.rate(r,S.streak);
+    if(d.note!=null&&r==='perfect'){ const dur=Math.min(0.9,0.2+d.noteLen*S.T*0.5); SFX.note(d.note,dur); (S.tune=S.tune||[]).push({t:S.t,midi:d.note,dur}); }   // S.tune: the player's own taps, for the replay button
+    else SFX.rate(r,S.streak);
     const inRadar=S.radar&&r!=='perfect'&&d.y>RADAR_CEIL&&d.y<radarAt(d.wx);   // canopy opened inside the radar zone
     if(inRadar){ d.spotT=S.t; SFX.siren(); }
     if(r!=='perfect'){ if(inRadar&&S.heartsMax) caught(d); else loseHeart(d); }

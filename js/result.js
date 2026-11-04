@@ -97,7 +97,7 @@ function showLevelEnd(){
   $('stats').innerHTML=[['p',perf,'Perfect'],['c',close,'Lives lost'],['',S.best,'Best streak']]
     .map(([cl,v,l])=>`<div class="stat ${cl}"><strong>${v}</strong>${l}</div>`).join('');
   const strip=$('strip'); strip.className='strip'; strip.style.minHeight='';
-  strip.style.setProperty('--n',N);
+  strip.style.setProperty('--n',Math.min(N,14));   // long song levels wrap onto more rows
   strip.innerHTML=humans.map((d,i)=>{const c=cls(d);
     return `<div class="tile ${c}" style="--d:${(i*0.06).toFixed(2)}s">${TILE_ICON[c]}</div>`}).join('');
   if(passed&&perf===N){   // every landing perfect: "ALL PERFECT!" replaces the tiles at once
@@ -124,9 +124,14 @@ function showLevelEnd(){
     if(opensNow){ const seq=resultSeq; rt(()=>{ if(seq===resultSeq) playWorldUnlock(nw); },reduceMotion?300:doneAt); }
   }
   $('endOv').hidden=false;$('endOv').scrollTop=0;endShownAt=performance.now();
+  // Song levels: play back the player's own tune. It appears once the star and ALL PERFECT sounds are over, so nothing plays on top of it.
+  const rb=$('replayBtn'); rb.hidden=!(passed&&S.tune&&S.tune.length&&settings.sound!=='off'); rb.style.visibility='hidden';
+  if(!rb.hidden) rt(()=>{ rb.style.visibility=''; },Math.max(doneAt,perf===N?N*60+1700:0));
   if(earned) startDoubleOffer(Math.max(DBL_OFFER_MS,reduceMotion?0:doneAt));
 }
 // the next-world button on the result screen of a world's last level; locked, it shows the stars and opens the popup
+$('replayBtn').addEventListener('click',e=>{ e.currentTarget.blur(); if(!S||!S.tune||!S.tune.length) return;
+  SFX.unlock(); SFX.cutAll(); const t0=S.tune[0].t; for(const n of S.tune) SFX.note(n.midi,n.dur,n.t-t0); });
 function renderWorldBtn(nw,open,before){
   const ts=before!=null?before:totalStars();
   $('nextBtn').innerHTML=open?`World ${nw+1} ▶`:`<span class="lock">🔒</span> World ${nw+1}<small>${ts}/${worldNeed(nw)}★</small>`;

@@ -18,7 +18,7 @@ const CLOUD_TH=0.17;                    // cloud bank thickness
 const CLOUD_DIP=0.09;                   // max dip of the cloud base between neighbouring landings
 const MIN_GAP=0.15;                     // all-perfect check: next band window must open >= this after the previous one
 const SIM_DT=1/240;
-const TEMPO={slow:1.1,med:0.85,fast:0.65};
+const TEMPO={slow:1.1,med:0.85,fast:0.65,pulse:0.5,t55:0.55,t48:0.48,t42:0.42};   // pulse, t55, t48, t42: rhythm test levels only
 const BANDSCALE={normal:1,thin:0.75,razor:0.55,wide:2};   // perfect window ≈ 120 / 90 / 65 ms; wide: dev only, to try the helper
 const HELPERS_ON=false;                 // ad helpers are hidden for now (user's choice); true brings the retry offer back
 const HELP_WIDE=2, HELP_OFFER=2.5;      // Wide green helper: band ×2 (grows upward only); seconds the retry offer stays up
@@ -107,14 +107,48 @@ LEVELS.push(
 const WORLDS=[
   {name:'Drop Zone'},{name:'City rooftops'},{name:'Base elevators'},{name:'Cloud cover'},{name:'Sabotage'},
 ];
+// ---------- Rhythm test levels (dev switch; branch only) ----------
+// The dev button swaps the whole game for this set, with its own save. Patterns are written on a tap grid:
+// x = tap, . = wait, each symbol = half a beat, spaces are only for reading. Keep taps at least 1 beat apart: buildings are 1 beat wide.
+const RHYTHM_KEY='chuteRhythm.rhythmTest', RHYTHM_ON=store.get(RHYTHM_KEY)==='1';
+const R=(pattern,heights=[0])=>{ const out=[]; let g=0;
+  for(const c of pattern.replace(/\s/g,'')){ if(c==='x'){ out.push({h:heights[out.length%heights.length],after:g}); g=0 } g+=0.5 }
+  return out; };
+// Song levels: each perfect tap plays the next note. 'E4:2' = note E4, then 2 beats to the next tap (default 1). Keep every gap at least 1 beat.
+const NOTE_ST={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const noteMidi=n=>{ const m=/^([A-G])(b?)(\d)$/.exec(n); return 12*(+m[3]+1)+NOTE_ST[m[1]]-(m[2]?1:0); };
+const SONG=s=>{ let g=0; return s.trim().split(/\s+/).map(t=>{ const [n,b]=t.split(':'), len=b?+b:1, o={h:0,after:g,note:noteMidi(n),len}; g=len; return o; }); };
+if(RHYTHM_ON){
+  const TW1='C4 C4 G4 G4 A4 A4 G4:2', TW2='F4 F4 E4 E4 D4 D4 C4:2', TW3='G4 G4 F4 F4 E4 E4 D4:2', TW_ALL=[TW1,TW2,TW3,TW3,TW1,TW2].join(' ');
+  const steady='x.x.x.x.', stomp='x.x.x...', tres='x..x..x.';
+  LEVELS.length=0; WORLDS.length=0; WORLDS.push({name:'Rhythm test'},{name:'Twinkle Twinkle'});
+  LEVELS.push(
+    L3('Steady','med',R(steady.repeat(3))),
+    L3('Steady fast','fast',R(steady.repeat(3))),
+    L3('Steady wave','fast',R(steady.repeat(3),[0,Lo,Mi,Ta,Hi,Ta,Mi,Lo])),
+    L3('Stomp','med',R(stomp.repeat(4))),
+    L3('Stomp fast','fast',R(stomp.repeat(4))),
+    L3('Stomp and turn','fast',R(stomp.repeat(3)+'x...x.x.')),
+    L3('Tresillo','fast',R(tres.repeat(4))),
+    L3('Tresillo quick','pulse',R(tres.repeat(4))),
+    L3('Tresillo and turn','pulse',R(tres.repeat(3)+'x.x.x.x.')),
+    L3('All three','fast',R(steady+stomp+tres+steady)),
+    // Twinkle world: the tune grows as the tempo rises
+    L3('First line','med',SONG(TW1)),
+    L3('First line, faster','fast',SONG(TW1)),
+    L3('Two lines','t55',SONG(TW1+' '+TW2)),
+    L3('Whole tune','t48',SONG(TW_ALL)),
+    L3('Twinkle finale','t42',SONG(TW_ALL)),
+  );
+}
 const PER_WORLD=10, W_NEED=25;   // running star total opens worlds: World 2 at 25★, World 3 at 50★, World 4 at 75★... stars are never spent
 const worldOf=n=>Math.floor(n/PER_WORLD);
 const levelLabel=n=>n+1;   // levels count on across worlds: World 2 starts at Level 11
 let training=false, trainingThen='level1';
 function startTraining(then){ training=true; trainingThen=then; start(); }
 let curLevel=0;
-const PKEY='chuteRhythm.v5.progress';   // new key: level numbering changed in v5.6
-let prog={stars:[],best:[],trained:false};
+const PKEY=RHYTHM_ON?'chuteRhythm.rhythmTest.progress':'chuteRhythm.v5.progress';   // new key: level numbering changed in v5.6
+let prog=RHYTHM_ON?{stars:[],best:[],trained:true,seen:[],unlockAll:true}:{stars:[],best:[],trained:false};
 try{const v=JSON.parse(store.get(PKEY)||'null'); if(v&&Array.isArray(v.stars)) prog=v}catch(e){}
 const saveProg=()=>store.set(PKEY,JSON.stringify(prog));
 // ---------- economy ----------
