@@ -3,6 +3,19 @@
 let inputMode=(window.matchMedia&&matchMedia('(pointer: coarse)').matches)?'touch':'key';
 addEventListener('pointerdown',e=>{ if(e.pointerType==='touch'||e.pointerType==='pen') inputMode='touch'; },{capture:true,passive:true});
 addEventListener('keydown',()=>{ inputMode='key'; },{capture:true,passive:true});
+// iPhone Safari can zoom on a quick second tap even with touch-action set. Cancel that tap's default (which also drops its
+// click) and click for it, so fast tapping still registers. Taps in play use pointerdown on the canvas, so they aren't touched.
+let lastTapEnd=-1e9, tapStart=null;
+addEventListener('touchstart',e=>{ const t=e.touches[0]; tapStart=e.touches.length===1?{x:t.clientX,y:t.clientY,at:performance.now()}:null; },{capture:true,passive:true});
+addEventListener('touchend',e=>{
+  const t=e.changedTouches[0], now=performance.now(), s=tapStart; tapStart=null;
+  if(!s||e.touches.length||Math.hypot(t.clientX-s.x,t.clientY-s.y)>10||now-s.at>400) return;   // pinches, scrolls and long presses stay as they are
+  const quick=now-lastTapEnd<350; lastTapEnd=now;
+  if(!quick||!e.cancelable) return;
+  e.preventDefault();
+  const b=e.target.closest&&e.target.closest('button');
+  if(b) b.click(); else e.target.dispatchEvent(new MouseEvent('click',{bubbles:true,cancelable:true}));
+},{capture:true,passive:false});
 function roundRect(c,x,y,w,h,r){ c.beginPath(); c.moveTo(x+r,y); c.arcTo(x+w,y,x+w,y+h,r); c.arcTo(x+w,y+h,x,y+h,r); c.arcTo(x,y+h,x,y,r); c.arcTo(x,y,x+w,y,r); c.closePath(); }
 function tap(){
   if(paused){ resumeRun(); return; }      // this tap only brings the game back
