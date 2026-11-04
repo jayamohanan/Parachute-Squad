@@ -4,7 +4,7 @@ function watchAd(onDone,onCancel){
   const ov=$('adOv'), fill=$('adFill'); ov.hidden=false;
   fill.style.transition='none'; fill.style.width='0'; void fill.offsetWidth; fill.style.transition='width 15s linear'; fill.style.width='100%';
   adCb=onDone; adCancel=onCancel||null; clearTimeout(adTimer); clearInterval(adTick);
-  const end=performance.now()+15000, showLeft=()=>{ $('adLeft').textContent=`Reward in ${Math.max(0,Math.ceil((end-performance.now())/1000))}s`; };
+  const end=performance.now()+15000, showLeft=()=>{ $('rewardLeft').textContent=`Reward in ${Math.max(0,Math.ceil((end-performance.now())/1000))}s`; };
   showLeft(); adTick=setInterval(showLeft,200);
   adTimer=setTimeout(()=>{ clearInterval(adTick); ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },15000);
 }
