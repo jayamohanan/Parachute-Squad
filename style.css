@@ -346,3 +346,4 @@ body:not(.levels) .lvonly{display:none!important}
   #howBtn{grid-row:2}
   #howBack{grid-row:3}
 }
+#devTog{display:none!important}   /* dev controls hidden for the Poki snapshot; delete this line to bring the gear back */
