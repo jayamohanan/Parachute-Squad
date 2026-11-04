@@ -161,6 +161,7 @@ body:not(.levels) .lvonly{display:none!important}
 @keyframes lvRing{0%,50%{opacity:0;transform:scale(.4)}55%{opacity:.9;transform:scale(.5)}100%{opacity:0;transform:scale(1.5)}}
 @media (prefers-reduced-motion:reduce){.lvhand,.lvring{animation:none}.lvring{display:none}}
 .lv:focus-visible{outline:2px solid var(--mint);outline-offset:2px}
+.wpanel{display:flex;flex-direction:column;gap:12px;margin:0 -10px -8px;padding:12px 10px;border-radius:14px;background:rgba(0,0,0,.28)}   /* darker tray: the world, apart from coins and store. Negative margin keeps the level tiles their full size */
 .wnav{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .wnav .lvsub{margin:0;text-align:center;flex:1;font-family:var(--f-display);font-size:22px!important;font-weight:400;letter-spacing:0;text-transform:none;color:var(--ink-on-navy)!important}
 .wbtn{width:34px;height:34px;border-radius:50%;border:0;background:var(--navy-2);color:var(--ink-on-navy);font-family:var(--f-display);font-size:22px;line-height:1;cursor:pointer}
@@ -322,7 +323,8 @@ body:not(.levels) .lvonly{display:none!important}
   .result #rTrack{grid-column:2;grid-row:2 / span 2}
   .result .actions{grid-column:2;grid-row:4}
   .lvcard{max-width:720px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:8px 14px;align-items:center}
-  .lvcard>*{grid-column:1}
+  .lvcard>*,.wpanel>*{grid-column:1}
+  .wpanel{display:contents}   /* side by side already: its rows stay direct items of the card's grid */
   .lvcard .lvgrid{grid-column:2;grid-row:1 / span 3}
   .shopcard{max-width:none;height:100%;display:grid;grid-template-columns:200px minmax(0,1fr);grid-template-rows:auto minmax(0,1fr) auto;gap:8px 12px}
   .shophead{grid-column:1;grid-row:1}

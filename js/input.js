@@ -52,7 +52,7 @@ addEventListener('keydown',e=>{
     if(e.code==='Enter') return;
     if(!$('gradOv').hidden){e.preventDefault();const b=$('gradActs').querySelector('.btn');if(b)b.click();return}
     if(!$('startOv').hidden){e.preventDefault();start()}
-    else if(!$('levelsOv').hidden){e.preventDefault();const n=LEVELS.findIndex((_,i)=>unlocked(i)&&!(prog.stars[i]>0));curLevel=n<0?0:n; training=false; start()}
+    else if(!$('levelsOv').hidden){e.preventDefault();let n=gridNext(viewWorld); if(n<0) n=worldOf(curLevel)===viewWorld?curLevel:viewWorld*PER_WORLD; if(unlocked(n)){curLevel=n; training=false; start()}}
     else if(!$('howOv').hidden){e.preventDefault();$('howBtn').click()}
     else if(!$('wPop').hidden){e.preventDefault();$('wPop').hidden=true}
     else if(!$('endOv').hidden&&performance.now()-endShownAt>500){e.preventDefault();

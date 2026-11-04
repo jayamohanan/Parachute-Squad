@@ -80,14 +80,23 @@ $('playRetry').addEventListener('click',e=>{restart();e.currentTarget.blur()});
 $('startBtn').addEventListener('click',start);
 $('againBtn').addEventListener('click',retryFromResult);
 $('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} else showWorldPop(worldOf(curLevel)+1); });
-$('lvBtn').addEventListener('click',showLevels);
-$('menuBtn').addEventListener('click',e=>{setDev(false);showLevels();e.currentTarget.blur()});
+function levelsFromLevel(){ viewWorld=worldOf(Math.min(curLevel,LEVELS.length-1)); showLevels(true); }   // the grid opens on the world of the level just played
+$('lvBtn').addEventListener('click',levelsFromLevel);
+$('menuBtn').addEventListener('click',e=>{setDev(false);levelsFromLevel();e.currentTarget.blur()});
 function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; $('helpOv').hidden=true; }
 let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });
 $('unlockAll').addEventListener('click',e=>{ prog.unlockAll=!prog.unlockAll; saveProg(); syncUnlockAll(); if(!$('levelsOv').hidden) showLevels(true); e.currentTarget.blur(); });
 function syncUnlockAll(){ $('unlockAll').textContent=prog.unlockAll?'Lock levels again':'Unlock all levels'; }
+// The level the grid highlights and Space starts, from the world on screen only: the last level played if it has no
+// stars, else the next one after it with none, else the first with none in that world. -1 = nothing left to do there.
+function gridNext(w){
+  const from=w*PER_WORLD, to=Math.min(from+PER_WORLD,LEVELS.length), todo=n=>unlocked(n)&&!(prog.stars[n]>0);
+  if(worldOf(curLevel)===w) for(let n=curLevel;n<to;n++) if(todo(n)) return n;
+  for(let n=from;n<to;n++) if(todo(n)) return n;
+  return -1;
+}
 function showLevels(keepWorld){
   if(!$('endOv').hidden) leaveResult();
   stopRun(); S=null; training=false; $('gradOv').hidden=true;
@@ -95,15 +104,15 @@ function showLevels(keepWorld){
   const g=$('lvgrid'); g.innerHTML='';
   let nextUp=LEVELS.findIndex((_,n)=>unlocked(n)&&!(prog.stars[n]>0)); if(nextUp<0) nextUp=-1;
   if(keepWorld!==true||viewWorld==null) viewWorld=worldOf(nextUp>=0?nextUp:Math.min(curLevel,LEVELS.length-1));
-  const vw=viewWorld;
+  const vw=viewWorld, hl=gridNext(vw);
   $('wName').textContent=`${vw+1} · ${WORLDS[vw].name}`;
   $('wPrev').disabled=vw===0; $('wNext').disabled=vw===WORLDS.length-1;
   syncUnlockAll();
   LEVELS.forEach((L,n)=>{ if(worldOf(n)!==vw) return;
     const b=document.createElement('button'), st=prog.stars[n]||0, open=unlocked(n);
-    b.className='lv'+(n===nextUp?' next':''); b.disabled=!open; b.title=L.name;
+    b.className='lv'+(n===hl?' next':''); b.disabled=!open; b.title=L.name;
     b.innerHTML=`${open?levelLabel(n):'🔒'}<small>${open?[0,1,2].map(i=>`<span${i<st?'':' class="dim"'}>★</span>`).join(''):''}</small>`;
-    if(n===0&&nextUp===0&&prog.trained){   // first visit after training: a tapping hand invites the player to Level 1
+    if(n===0&&hl===0&&prog.trained){   // first visit after training: a tapping hand invites the player to Level 1
       b.insertAdjacentHTML('beforeend',`<span class="lvring"></span><span class="lvhand" aria-hidden="true"><svg viewBox="-14 -22 30 42"><path d="M-6,-16 A3,3 0 0 1 0,-16 L0,-4 L9,-2 Q14,0 13,8 L11,16 L-4,16 L-10,6 Q-12,1 -7,2 L-6,4 Z" fill="#fff" stroke="#132238" stroke-width="2.5" stroke-linejoin="round"/></svg></span>`); }
     b.addEventListener('click',()=>{curLevel=n; training=false; start()});
     g.appendChild(b);
