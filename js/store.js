@@ -1,12 +1,14 @@
 // ---------- fake rewarded ad (stands in for PokiSDK.rewardedBreak: reward only when it finishes) ----------
-let adCb=null, adCancel=null, adTimer=0;
+let adCb=null, adCancel=null, adTimer=0, adTick=0;
 function watchAd(onDone,onCancel){
   const ov=$('adOv'), fill=$('adFill'); ov.hidden=false;
   fill.style.transition='none'; fill.style.width='0'; void fill.offsetWidth; fill.style.transition='width 15s linear'; fill.style.width='100%';
-  adCb=onDone; adCancel=onCancel||null; clearTimeout(adTimer);
-  adTimer=setTimeout(()=>{ ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },15000);
+  adCb=onDone; adCancel=onCancel||null; clearTimeout(adTimer); clearInterval(adTick);
+  const end=performance.now()+15000, showLeft=()=>{ $('adLeft').textContent=`Reward in ${Math.max(0,Math.ceil((end-performance.now())/1000))}s`; };
+  showLeft(); adTick=setInterval(showLeft,200);
+  adTimer=setTimeout(()=>{ clearInterval(adTick); ov.hidden=true; const cb=adCb; adCb=null; if(cb) cb(); },15000);
 }
-$('adClose').addEventListener('click',()=>{ clearTimeout(adTimer); adCb=null; $('adOv').hidden=true; const c=adCancel; adCancel=null; if(c) c(); });
+$('adClose').addEventListener('click',()=>{ clearTimeout(adTimer); clearInterval(adTick); adCb=null; $('adOv').hidden=true; const c=adCancel; adCancel=null; if(c) c(); });
 
 // ---------- store ----------
 const LISTS={chute:CHUTES,diver:DIVERS,plane:PLANES};

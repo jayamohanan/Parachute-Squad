@@ -100,20 +100,17 @@ function showLevelEnd(){
   strip.style.setProperty('--n',N);
   strip.innerHTML=humans.map((d,i)=>{const c=cls(d);
     return `<div class="tile ${c}" style="--d:${(i*0.06).toFixed(2)}s">${TILE_ICON[c]}</div>`}).join('');
-  if(passed&&perf===N){   // every landing perfect: the tiles ripple away and "ALL PERFECT!" takes their place
-    const seq=resultSeq, t0=N*60+250+450, t1=N*35+330;
+  if(passed&&perf===N){   // every landing perfect: "ALL PERFECT!" replaces the tiles at once
+    const seq=resultSeq, t0=N*60+250+450;
     rt(()=>{ if(seq!==resultSeq) return;
-      strip.querySelectorAll('.tile').forEach((t,i)=>{ t.style.setProperty('--d2',(i*0.035).toFixed(3)+'s'); t.classList.add('out'); });
-      rt(()=>{ if(seq!==resultSeq) return;
-        const chute='<svg viewBox="-20 -20 40 40" aria-hidden="true"><path d="M-17,-2 A17,13 0 0 1 17,-2 Z" fill="#ffd23f" stroke="#a87400" stroke-width="2"/><path d="M-6,-2 A6,13 0 0 1 6,-2 Z" fill="#fff6c2"/><path d="M-16,-2 L0,14 M16,-2 L0,14 M0,-2 L0,14" stroke="#a87400" stroke-width="1.6"/><circle cx="0" cy="16" r="3" fill="#ffd23f" stroke="#a87400" stroke-width="1.5"/></svg>';
-        strip.style.minHeight=strip.offsetHeight+'px'; strip.className='strip ap';   // keep the height so buttons don't jump
-        strip.innerHTML=`<div class="allperf">${chute}<span>ALL PERFECT!</span>${chute}</div>`+
-          Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2, r=70+Math.random()*60;
-            return `<span class="spark" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r*0.45).toFixed(0)}px;--sd:${(Math.random()*0.15).toFixed(2)}s">✦</span>`}).join('');
-        SFX.chord();   // one warm chord (v6.7: was a second jingle + 4 rising high notes)
-      },t1);
+      const chute='<svg viewBox="-20 -20 40 40" aria-hidden="true"><path d="M-17,-2 A17,13 0 0 1 17,-2 Z" fill="#ffd23f" stroke="#a87400" stroke-width="2"/><path d="M-6,-2 A6,13 0 0 1 6,-2 Z" fill="#fff6c2"/><path d="M-16,-2 L0,14 M16,-2 L0,14 M0,-2 L0,14" stroke="#a87400" stroke-width="1.6"/><circle cx="0" cy="16" r="3" fill="#ffd23f" stroke="#a87400" stroke-width="1.5"/></svg>';
+      strip.style.minHeight=strip.offsetHeight+'px'; strip.className='strip ap';   // keep the height so buttons don't jump
+      strip.innerHTML=`<div class="allperf">${chute}<span>ALL PERFECT!</span>${chute}</div>`+
+        Array.from({length:12},(_,i)=>{const a=i/12*Math.PI*2, r=70+Math.random()*60;
+          return `<span class="spark" style="--x:${(Math.cos(a)*r).toFixed(0)}px;--y:${(Math.sin(a)*r*0.45).toFixed(0)}px;--sd:${(Math.random()*0.15).toFixed(2)}s">✦</span>`}).join('');
+      SFX.chord();   // one warm chord (v6.7: was a second jingle + 4 rising high notes)
     },t0);
-    doneAt=Math.max(doneAt,t0+t1+1600);
+    doneAt=Math.max(doneAt,t0+1600);
   }
   // buttons; the last level of a world always shows the way to the next world
   const won=passed||prevSt>0;   // failed a replay of a level already won: Next is offered, Retry stays the main button
