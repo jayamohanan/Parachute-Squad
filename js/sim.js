@@ -67,6 +67,7 @@ function burst(wx,y,n,color,spd,up,life=0.6){
 }
 
 // ---------- simulation ----------
+const CAM_EASE=0.45;   // seconds the camera takes to glide to a stop once every diver has opened or landed
 function update(dt){
   if(S.col){ const c=S.col; c.ct+=dt;
     dt*=c.ct<COL.slowEnd?COL.slow:Math.min(1,COL.slow+(c.ct-COL.slowEnd)/0.25*(1-COL.slow)); }
@@ -104,6 +105,9 @@ function update(dt){
     }
     if(d.state==='landed') d.landT+=dt;
   }
+  // nothing left to time: the camera glides to a stop and the plane flies on (view only; the radar collapse runs its own camera)
+  if(S.camStop==null&&!S.col&&S.divers.every(d=>d.opened||d.state==='landed')) S.camStop=S.t;
+  if(S.camStop!=null){ const e=Math.min(S.t-S.camStop,CAM_EASE); S.camT=S.camStop+e-e*e/(2*CAM_EASE); }
   for(const p of S.particles){p.t+=dt;p.wx+=p.vx*dt;p.y+=p.vy*dt;p.vy+=0.9*dt}
   S.particles=S.particles.filter(p=>p.t<p.life);
   for(const p of S.pops){p.t+=dt}

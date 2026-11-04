@@ -50,6 +50,7 @@
       <div class="helphint" id="helpHint"></div>
     </div>
     <button class="playretry" id="playRetry" aria-label="Retry" hidden><i class="ico i-retry" aria-hidden="true"></i></button>
+    <button class="playretry playsound" id="playSound" aria-label="Sound on" hidden><i class="ico i-sound" aria-hidden="true"></i></button>
     <div class="vpanel" id="vpanel" hidden>
       <div class="vrow"><div><b>Moving platforms</b><span>About 1 in 3 landings is a lift that bobs up and down. Any tap freezes it.</span></div>
         <div class="seg" data-key="platforms"><button data-v="off">Off</button><button data-v="on">On</button></div></div>
@@ -135,9 +136,9 @@
           <div class="track lvonly" id="rTrack" hidden></div>
           <div class="legend"><span><i style="background:#2fd88a"></i>Perfect</span><span><i style="background:#ffc9d4"></i>Miss</span><span><i style="background:#ff6b4a"></i>Splat</span></div>
           <div class="actions iconbtns">
-            <button class="btn lvonly" id="nextBtn"></button>
+            <button class="btn ghost lvonly" id="lvBtn"><i class="ico lg i-levels" role="img" aria-label="Levels"></i></button>
             <button class="btn" id="againBtn"><i class="ico lg i-retry" role="img" aria-label="Retry"></i></button>
-            <button class="btn ghost lvonly" id="lvBtn"><i class="ico lg i-levels" role="img" aria-label="Levels"></i></button></div>
+            <button class="btn lvonly" id="nextBtn"></button></div>
         </div>
       </div>
     </div>

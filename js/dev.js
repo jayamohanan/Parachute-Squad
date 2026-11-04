@@ -5,6 +5,7 @@ function syncUI(){
   });
   const n=VKEYS.filter(k=>settings[k]!=='off').length;
   $('vcount').textContent=n; $('vcount').hidden=n===0;
+  const snd=settings.sound!=='off', sb=$('playSound'); sb.firstElementChild.className='ico '+(snd?'i-sound':'i-muted'); sb.setAttribute('aria-label',snd?'Sound on':'Sound off');
 }
 document.querySelectorAll('.seg[data-key]').forEach(seg=>{
   seg.addEventListener('click',e=>{

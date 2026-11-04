@@ -52,7 +52,7 @@ function loop(ts,id){
   const dt=Math.min(0.05,(ts-lastTS)/1000||0);lastTS=ts;
   if(running&&S&&!paused) update(dt*tutScale(dt));
   draw();
-  $('playRetry').hidden=!(running&&S&&S.level!=null&&S.level>=0);
+  $('playRetry').hidden=$('playSound').hidden=!(running&&S&&S.level!=null&&S.level>=0);
   if(running) requestAnimationFrame(t=>loop(t,id));
 }
 function start(skipIntro){
@@ -77,13 +77,17 @@ function restart(){
 $('restartBtn').addEventListener('click',e=>{setDev(false);restart();e.currentTarget.blur()});
 addEventListener('keydown',e=>{ if(e.code==='KeyR'&&!e.metaKey&&!e.ctrlKey&&!e.altKey&&$('adOv').hidden&&$('shopOv').hidden){e.preventDefault();restart()} });
 $('playRetry').addEventListener('click',e=>{restart();e.currentTarget.blur()});
+$('playSound').addEventListener('click',e=>{
+  const v=settings.sound==='off'?'on':'off'; settings.sound=v; store.set('chuteRhythm.v3.settings',JSON.stringify(settings));
+  SFX.set(v==='on'); if(v==='on') SFX.unlock(); syncUI(); e.currentTarget.blur();
+});
 $('startBtn').addEventListener('click',start);
 $('againBtn').addEventListener('click',retryFromResult);
 $('nextBtn').addEventListener('click',()=>{ if(curLevel<LEVELS.length-1&&unlocked(curLevel+1)){curLevel++;start()} else showWorldPop(worldOf(curLevel)+1); });
 function levelsFromLevel(){ viewWorld=worldOf(Math.min(curLevel,LEVELS.length-1)); showLevels(true); }   // the grid opens on the world of the level just played
 $('lvBtn').addEventListener('click',levelsFromLevel);
 $('menuBtn').addEventListener('click',e=>{setDev(false);levelsFromLevel();e.currentTarget.blur()});
-function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; $('helpOv').hidden=true; }
+function stopRun(){ SFX.droneStop(); running=false; runId++; clearPause(); $('playRetry').hidden=true; $('playSound').hidden=true; $('helpOv').hidden=true; }
 let viewWorld=null;
 $('wPrev').addEventListener('click',()=>{ if(viewWorld>0){viewWorld--; showLevels(true)} });
 $('wNext').addEventListener('click',()=>{ if(viewWorld<WORLDS.length-1){viewWorld++; showLevels(true)} });

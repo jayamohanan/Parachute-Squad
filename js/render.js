@@ -187,12 +187,12 @@ function draw(){
   const col=S&&S.col, pl=col&&col.plane;
   if(col){ for(const m of col.smoke){ const a=Math.max(0,0.5*(1-m.t/1.8)), r=(5+m.t*9)*k*m.r;
       ctx.fillStyle=`rgba(70,70,78,${a})`; ctx.beginPath(); ctx.arc(sx(m.wx),m.y*H,r,0,Math.PI*2); ctx.fill(); } }
-  const planeX=pl?sx(pl.wx):PX, planeY=pl?pl.y*H:planeYAt(planeWX)*H;
+  const flyWX=S?S.t/T:0, planeX=pl?sx(pl.wx):sx(flyWX), planeY=pl?pl.y*H:planeYAt(flyWX)*H;   // the plane keeps flying after the camera stops
   if(col&&col.ev.look&&!pl&&col.post){   // searchlight swings up to the plane
     const p=col.post, x0=sx(p.wx), y0=(p.g-0.062)*H, nx=-(planeY-y0), ny=planeX-x0, nl=Math.hypot(nx,ny)||1, w=26*k;
     ctx.fillStyle='rgba(255,240,150,.42)'; ctx.beginPath(); ctx.moveTo(x0,y0); ctx.lineTo(planeX+nx/nl*w,planeY+ny/nl*w); ctx.lineTo(planeX-nx/nl*w,planeY-ny/nl*w); ctx.closePath(); ctx.fill(); }
   if(pl){ if(!pl.gone){ ctx.save(); ctx.translate(planeX,planeY); ctx.rotate(pl.rot+Math.sin(now*14)*0.06); drawPlane(0,0,k); ctx.restore(); } }
-  else drawPlane(PX,planeY,k);
+  else drawPlane(planeX,planeY,k);
   if(col&&col.boom&&col.boom.t<1.6){   // cartoon explosion: flash, fireball puffs that turn to smoke, then gone
     const b=col.boom, t=b.t, x=sx(b.wx), y=b.y*H;
     if(t<0.18){ ctx.fillStyle=`rgba(255,255,240,${0.9*(1-t/0.18)})`; ctx.beginPath(); ctx.arc(x,y,(30+t*400)*k,0,Math.PI*2); ctx.fill(); }
