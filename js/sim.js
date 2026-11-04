@@ -77,7 +77,7 @@ function update(dt){
   for(const d of S.divers){
     if(S.frozenAt){ if(d.state==='landed') d.landT+=dt; continue; }
     if(d.state==='wait'&&S.t>=d.tDrop&&!S.failed){
-      d.y=planeYAt(d.wx)+0.025; SFX.drop();
+      d.y=planeYAt(d.wx)+0.025; if(!RHYTHM_ON) SFX.drop();
       if(d.faulty){ d.state='pre'; d.v=VPRE; d.chuteT=0 } else { d.state='fall'; d.v=V0 }
       if(!d.dummy&&!S.humansShown){S.humansShown=true;if(!S.banner){S.banner={text:'HUMANS NOW',t:0,dur:1.3}}SFX.humans()}
     }
